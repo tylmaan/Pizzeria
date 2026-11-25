@@ -1,0 +1,33 @@
+# Secrets / local config
+.env
+*.env.local
+appsettings.*.local.json
+
+# .NET
+bin/
+obj/
+*.user
+*.suo
+.vs/
+TestResults/
+*.trx
+coverage*.xml
+
+# Node / frontend
+node_modules/
+dist/
+dev-dist/
+coverage/
+*.tsbuildinfo
+.vite/
+.pnpm-store/
+
+# Local agent simulator output
+print-output/
+
+# IDE / OS
+.idea/
+.vscode/*
+!.vscode/extensions.json
+Thumbs.db
+.DS_Store

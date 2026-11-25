@@ -1,0 +1,19 @@
+{
+  "app": {
+    "staffTitle": "Panel lokalu",
+    "shopTitle": "Zamów pizzę"
+  },
+  "nav": {
+    "orders": "Zamówienia",
+    "kitchen": "Kuchnia",
+    "driver": "Kierowca",
+    "company": "Panel firmy"
+  },
+  "placeholder": {
+    "comingSoon": "Ta sekcja jest w budowie."
+  },
+  "errors": {
+    "unknown": "Coś poszło nie tak. Spróbuj ponownie.",
+    "network": "Brak połączenia z serwerem."
+  }
+}
