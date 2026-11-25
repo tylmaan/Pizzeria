@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Pizzeria.Application.Abstractions;
 using Pizzeria.Application.Tenancy;
 using Pizzeria.Domain.Common;
+using Pizzeria.Domain.Menu;
 using Pizzeria.Domain.Tenancy;
 using Pizzeria.Infrastructure.Identity;
 
@@ -21,6 +22,12 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options, ITenant
     public DbSet<Company> Companies => Set<Company>();
 
     public DbSet<Location> Locations => Set<Location>();
+
+    public DbSet<Category> Categories => Set<Category>();
+
+    public DbSet<Product> Products => Set<Product>();
+
+    public DbSet<ModifierGroup> ModifierGroups => Set<ModifierGroup>();
 
     public DbSet<UserLocation> UserLocations => Set<UserLocation>();
 

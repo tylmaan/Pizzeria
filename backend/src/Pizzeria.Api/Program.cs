@@ -1,4 +1,5 @@
 using System.Globalization;
+using System.Text.Json.Serialization;
 using System.Threading.RateLimiting;
 using Microsoft.AspNetCore.Identity;
 using Pizzeria.Api.Auth;
@@ -24,6 +25,8 @@ builder.Services.ConfigureHttpJsonOptions(options =>
 {
     options.SerializerOptions.RespectNullableAnnotations = true;
     options.SerializerOptions.RespectRequiredConstructorParameters = true;
+    // Enums travel as names ("MoreExpensiveHalf"), which keeps them readable and stable in TypeScript.
+    options.SerializerOptions.Converters.Add(new JsonStringEnumConverter());
 });
 builder.Services.AddOpenApi();
 builder.Services.AddProblemDetails(options => options.CustomizeProblemDetails = ProblemDetailsCodes.AddDefaultCode);
@@ -77,6 +80,7 @@ api.MapAuthEndpoints();
 api.MapPlatformEndpoints();
 api.MapLocationEndpoints();
 api.MapUserEndpoints();
+api.MapMenuEndpoints();
 
 await DatabaseInitializer.InitializeAsync(app.Services).ConfigureAwait(false);
 

@@ -11,9 +11,13 @@ public sealed class ProductPrice
 
     internal ProductPrice(Guid sizeId, decimal price)
     {
+        Id = Guid.CreateVersion7();
         SizeId = sizeId;
         Price = price;
     }
+
+    /// <summary>Row identity. Own key (not owner + size) so EF inserts new prices instead of updating.</summary>
+    public Guid Id { get; private set; }
 
     public Guid SizeId { get; private set; }
 
@@ -29,9 +33,12 @@ public sealed class ProductModifierGroup
 
     internal ProductModifierGroup(Guid modifierGroupId, int sortOrder)
     {
+        Id = Guid.CreateVersion7();
         ModifierGroupId = modifierGroupId;
         SortOrder = sortOrder;
     }
+
+    public Guid Id { get; private set; }
 
     public Guid ModifierGroupId { get; private set; }
 

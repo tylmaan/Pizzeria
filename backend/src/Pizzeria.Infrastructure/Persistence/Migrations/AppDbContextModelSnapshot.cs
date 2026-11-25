@@ -152,6 +152,131 @@ namespace Pizzeria.Infrastructure.Persistence.Migrations
                     b.ToTable("user_tokens", (string)null);
                 });
 
+            modelBuilder.Entity("Pizzeria.Domain.Menu.Category", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<Guid>("CompanyId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("company_id");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("name");
+
+                    b.Property<int>("SortOrder")
+                        .HasColumnType("integer")
+                        .HasColumnName("sort_order");
+
+                    b.HasKey("Id")
+                        .HasName("pk_categories");
+
+                    b.HasIndex("CompanyId")
+                        .HasDatabaseName("ix_categories_company_id");
+
+                    b.ToTable("categories", (string)null);
+                });
+
+            modelBuilder.Entity("Pizzeria.Domain.Menu.ModifierGroup", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<Guid>("CategoryId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("category_id");
+
+                    b.Property<Guid>("CompanyId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("company_id");
+
+                    b.Property<int>("MaxSelect")
+                        .HasColumnType("integer")
+                        .HasColumnName("max_select");
+
+                    b.Property<int>("MinSelect")
+                        .HasColumnType("integer")
+                        .HasColumnName("min_select");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("name");
+
+                    b.Property<int>("SortOrder")
+                        .HasColumnType("integer")
+                        .HasColumnName("sort_order");
+
+                    b.HasKey("Id")
+                        .HasName("pk_modifier_groups");
+
+                    b.HasIndex("CategoryId")
+                        .HasDatabaseName("ix_modifier_groups_category_id");
+
+                    b.HasIndex("CompanyId")
+                        .HasDatabaseName("ix_modifier_groups_company_id");
+
+                    b.ToTable("modifier_groups", (string)null);
+                });
+
+            modelBuilder.Entity("Pizzeria.Domain.Menu.Product", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<bool>("AllowsHalves")
+                        .HasColumnType("boolean")
+                        .HasColumnName("allows_halves");
+
+                    b.Property<Guid>("CategoryId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("category_id");
+
+                    b.Property<Guid>("CompanyId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("company_id");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)")
+                        .HasColumnName("description");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_active");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("character varying(150)")
+                        .HasColumnName("name");
+
+                    b.Property<int>("SortOrder")
+                        .HasColumnType("integer")
+                        .HasColumnName("sort_order");
+
+                    b.HasKey("Id")
+                        .HasName("pk_products");
+
+                    b.HasIndex("CategoryId")
+                        .HasDatabaseName("ix_products_category_id");
+
+                    b.HasIndex("CompanyId")
+                        .HasDatabaseName("ix_products_company_id");
+
+                    b.ToTable("products", (string)null);
+                });
+
             modelBuilder.Entity("Pizzeria.Domain.Tenancy.Company", b =>
                 {
                     b.Property<Guid>("Id")
@@ -162,6 +287,12 @@ namespace Pizzeria.Infrastructure.Persistence.Migrations
                     b.Property<DateTimeOffset>("CreatedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at");
+
+                    b.Property<string>("HalfAndHalfPricing")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("character varying(30)")
+                        .HasColumnName("half_and_half_pricing");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -429,6 +560,238 @@ namespace Pizzeria.Infrastructure.Persistence.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("fk_user_tokens_users_user_id");
+                });
+
+            modelBuilder.Entity("Pizzeria.Domain.Menu.Category", b =>
+                {
+                    b.HasOne("Pizzeria.Domain.Tenancy.Company", null)
+                        .WithMany()
+                        .HasForeignKey("CompanyId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_categories_companies_company_id");
+
+                    b.OwnsMany("Pizzeria.Domain.Menu.Size", "Sizes", b1 =>
+                        {
+                            b1.Property<Guid>("Id")
+                                .HasColumnType("uuid")
+                                .HasColumnName("id");
+
+                            b1.Property<Guid>("CategoryId")
+                                .HasColumnType("uuid")
+                                .HasColumnName("category_id");
+
+                            b1.Property<string>("Name")
+                                .IsRequired()
+                                .HasMaxLength(30)
+                                .HasColumnType("character varying(30)")
+                                .HasColumnName("name");
+
+                            b1.Property<int>("SortOrder")
+                                .HasColumnType("integer")
+                                .HasColumnName("sort_order");
+
+                            b1.HasKey("Id")
+                                .HasName("pk_category_sizes");
+
+                            b1.HasIndex("CategoryId")
+                                .HasDatabaseName("ix_category_sizes_category_id");
+
+                            b1.ToTable("category_sizes", (string)null);
+
+                            b1.WithOwner()
+                                .HasForeignKey("CategoryId")
+                                .HasConstraintName("fk_category_sizes_categories_category_id");
+                        });
+
+                    b.Navigation("Sizes");
+                });
+
+            modelBuilder.Entity("Pizzeria.Domain.Menu.ModifierGroup", b =>
+                {
+                    b.HasOne("Pizzeria.Domain.Menu.Category", null)
+                        .WithMany()
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_modifier_groups_categories_category_id");
+
+                    b.HasOne("Pizzeria.Domain.Tenancy.Company", null)
+                        .WithMany()
+                        .HasForeignKey("CompanyId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_modifier_groups_companies_company_id");
+
+                    b.OwnsMany("Pizzeria.Domain.Menu.Modifier", "Modifiers", b1 =>
+                        {
+                            b1.Property<Guid>("Id")
+                                .HasColumnType("uuid")
+                                .HasColumnName("id");
+
+                            b1.Property<bool>("IsActive")
+                                .HasColumnType("boolean")
+                                .HasColumnName("is_active");
+
+                            b1.Property<Guid>("ModifierGroupId")
+                                .HasColumnType("uuid")
+                                .HasColumnName("modifier_group_id");
+
+                            b1.Property<string>("Name")
+                                .IsRequired()
+                                .HasMaxLength(100)
+                                .HasColumnType("character varying(100)")
+                                .HasColumnName("name");
+
+                            b1.Property<int>("SortOrder")
+                                .HasColumnType("integer")
+                                .HasColumnName("sort_order");
+
+                            b1.HasKey("Id")
+                                .HasName("pk_modifiers");
+
+                            b1.HasIndex("ModifierGroupId")
+                                .HasDatabaseName("ix_modifiers_modifier_group_id");
+
+                            b1.ToTable("modifiers", (string)null);
+
+                            b1.WithOwner()
+                                .HasForeignKey("ModifierGroupId")
+                                .HasConstraintName("fk_modifiers_modifier_groups_modifier_group_id");
+
+                            b1.OwnsMany("Pizzeria.Domain.Menu.ModifierPrice", "Prices", b2 =>
+                                {
+                                    b2.Property<Guid>("Id")
+                                        .HasColumnType("uuid")
+                                        .HasColumnName("id");
+
+                                    b2.Property<Guid>("ModifierId")
+                                        .HasColumnType("uuid")
+                                        .HasColumnName("modifier_id");
+
+                                    b2.Property<decimal>("Price")
+                                        .HasPrecision(10, 2)
+                                        .HasColumnType("numeric(10,2)")
+                                        .HasColumnName("price");
+
+                                    b2.Property<Guid>("SizeId")
+                                        .HasColumnType("uuid")
+                                        .HasColumnName("size_id");
+
+                                    b2.HasKey("Id")
+                                        .HasName("pk_modifier_prices");
+
+                                    b2.HasIndex("ModifierId", "SizeId")
+                                        .IsUnique()
+                                        .HasDatabaseName("ix_modifier_prices_modifier_id_size_id");
+
+                                    b2.ToTable("modifier_prices", (string)null);
+
+                                    b2.WithOwner()
+                                        .HasForeignKey("ModifierId")
+                                        .HasConstraintName("fk_modifier_prices_modifiers_modifier_id");
+                                });
+
+                            b1.Navigation("Prices");
+                        });
+
+                    b.Navigation("Modifiers");
+                });
+
+            modelBuilder.Entity("Pizzeria.Domain.Menu.Product", b =>
+                {
+                    b.HasOne("Pizzeria.Domain.Menu.Category", null)
+                        .WithMany()
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_products_categories_category_id");
+
+                    b.HasOne("Pizzeria.Domain.Tenancy.Company", null)
+                        .WithMany()
+                        .HasForeignKey("CompanyId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_products_companies_company_id");
+
+                    b.OwnsMany("Pizzeria.Domain.Menu.ProductModifierGroup", "ModifierGroups", b1 =>
+                        {
+                            b1.Property<Guid>("Id")
+                                .HasColumnType("uuid")
+                                .HasColumnName("id");
+
+                            b1.Property<Guid>("ModifierGroupId")
+                                .HasColumnType("uuid")
+                                .HasColumnName("modifier_group_id");
+
+                            b1.Property<Guid>("ProductId")
+                                .HasColumnType("uuid")
+                                .HasColumnName("product_id");
+
+                            b1.Property<int>("SortOrder")
+                                .HasColumnType("integer")
+                                .HasColumnName("sort_order");
+
+                            b1.HasKey("Id")
+                                .HasName("pk_product_modifier_groups");
+
+                            b1.HasIndex("ModifierGroupId")
+                                .HasDatabaseName("ix_product_modifier_groups_modifier_group_id");
+
+                            b1.HasIndex("ProductId", "ModifierGroupId")
+                                .IsUnique()
+                                .HasDatabaseName("ix_product_modifier_groups_product_id_modifier_group_id");
+
+                            b1.ToTable("product_modifier_groups", (string)null);
+
+                            b1.HasOne("Pizzeria.Domain.Menu.ModifierGroup", null)
+                                .WithMany()
+                                .HasForeignKey("ModifierGroupId")
+                                .OnDelete(DeleteBehavior.Restrict)
+                                .IsRequired()
+                                .HasConstraintName("fk_product_modifier_groups_modifier_groups_modifier_group_id");
+
+                            b1.WithOwner()
+                                .HasForeignKey("ProductId")
+                                .HasConstraintName("fk_product_modifier_groups_products_product_id");
+                        });
+
+                    b.OwnsMany("Pizzeria.Domain.Menu.ProductPrice", "Prices", b1 =>
+                        {
+                            b1.Property<Guid>("Id")
+                                .HasColumnType("uuid")
+                                .HasColumnName("id");
+
+                            b1.Property<decimal>("Price")
+                                .HasPrecision(10, 2)
+                                .HasColumnType("numeric(10,2)")
+                                .HasColumnName("price");
+
+                            b1.Property<Guid>("ProductId")
+                                .HasColumnType("uuid")
+                                .HasColumnName("product_id");
+
+                            b1.Property<Guid>("SizeId")
+                                .HasColumnType("uuid")
+                                .HasColumnName("size_id");
+
+                            b1.HasKey("Id")
+                                .HasName("pk_product_prices");
+
+                            b1.HasIndex("ProductId", "SizeId")
+                                .IsUnique()
+                                .HasDatabaseName("ix_product_prices_product_id_size_id");
+
+                            b1.ToTable("product_prices", (string)null);
+
+                            b1.WithOwner()
+                                .HasForeignKey("ProductId")
+                                .HasConstraintName("fk_product_prices_products_product_id");
+                        });
+
+                    b.Navigation("ModifierGroups");
+
+                    b.Navigation("Prices");
                 });
 
             modelBuilder.Entity("Pizzeria.Domain.Tenancy.Location", b =>

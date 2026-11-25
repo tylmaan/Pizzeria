@@ -16,6 +16,11 @@ public static class ErrorCodes
     public const string CompanySlugTaken = "company.slug_taken";
     public const string LocationNotFound = "location.not_found";
 
+    public const string CategoryNotFound = "menu.category_not_found";
+    public const string ProductNotFound = "menu.product_not_found";
+    public const string ModifierGroupNotFound = "menu.modifier_group_not_found";
+    public const string SizeInUse = "menu.size_in_use";
+
     public const string UserEmailTaken = "user.email_taken";
     public const string RoleNotAssignable = "user.role_not_assignable";
     public const string LocationsRequired = "user.locations_required";

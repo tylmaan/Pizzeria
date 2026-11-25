@@ -13,8 +13,14 @@ internal static class SnakeCaseNaming
     {
         var entityTypes = modelBuilder.Model.GetEntityTypes().ToList();
 
+        // Owned types mapped into their owner's table (OwnsOne) share its key; owned collections (OwnsMany)
+        // have tables of their own. Decide before renaming, while names still match the defaults.
+        var sharingOwnerTable = entityTypes
+            .Where(e => e.IsOwned() && e.GetTableName() == e.FindOwnership()!.PrincipalEntityType.GetTableName())
+            .ToHashSet();
+
         // Tables first: default key/index names are derived from table names.
-        foreach (var entity in entityTypes.Where(e => !e.IsOwned()))
+        foreach (var entity in entityTypes.Where(e => !sharingOwnerTable.Contains(e)))
         {
             if (entity.GetTableName() is { } table)
             {
@@ -25,7 +31,7 @@ internal static class SnakeCaseNaming
         foreach (var entity in entityTypes)
         {
             // An owned type stored in its owner's table shares the owner's primary key column and key.
-            var sharesOwnerTable = entity.IsOwned();
+            var sharesOwnerTable = sharingOwnerTable.Contains(entity);
 
             foreach (var property in entity.GetProperties())
             {

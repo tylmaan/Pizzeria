@@ -22,7 +22,10 @@ public static class DependencyInjection
             ?? throw new InvalidOperationException(
                 $"Connection string '{ConnectionStringName}' is not configured (use user-secrets or ConnectionStrings__{ConnectionStringName}).");
 
-        services.AddDbContext<AppDbContext>(options => options.UseNpgsql(connectionString));
+        // Single query on purpose: menus are small and one query gives a consistent snapshot of an aggregate.
+        services.AddDbContext<AppDbContext>(options => options.UseNpgsql(
+            connectionString,
+            npgsql => npgsql.UseQuerySplittingBehavior(QuerySplittingBehavior.SingleQuery)));
         services.AddScoped<IAppDbContext>(sp => sp.GetRequiredService<AppDbContext>());
 
         services.Configure<DatabaseOptions>(configuration.GetSection(DatabaseOptions.SectionName));

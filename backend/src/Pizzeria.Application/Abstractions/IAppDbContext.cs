@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Pizzeria.Domain.Menu;
 using Pizzeria.Domain.Tenancy;
 
 namespace Pizzeria.Application.Abstractions;
@@ -13,6 +14,12 @@ public interface IAppDbContext
     DbSet<Company> Companies { get; }
 
     DbSet<Location> Locations { get; }
+
+    DbSet<Category> Categories { get; }
+
+    DbSet<Product> Products { get; }
+
+    DbSet<ModifierGroup> ModifierGroups { get; }
 
     DatabaseFacade Database { get; }
 

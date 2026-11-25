@@ -13,6 +13,7 @@ internal sealed class CompanyConfiguration : IEntityTypeConfiguration<Company>
         builder.Property(c => c.Name).HasMaxLength(Company.NameMaxLength).IsRequired();
         builder.Property(c => c.Slug).HasMaxLength(Company.SlugMaxLength).IsRequired();
         builder.HasIndex(c => c.Slug).IsUnique();
+        builder.Property(c => c.HalfAndHalfPricing).HasConversion<string>().HasMaxLength(30);
     }
 }
 

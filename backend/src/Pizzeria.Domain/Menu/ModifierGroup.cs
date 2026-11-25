@@ -10,9 +10,13 @@ public sealed class ModifierPrice
 
     internal ModifierPrice(Guid sizeId, decimal price)
     {
+        Id = Guid.CreateVersion7();
         SizeId = sizeId;
         Price = price;
     }
+
+    /// <summary>Row identity. Own key (not modifier + size) so EF inserts new prices instead of updating.</summary>
+    public Guid Id { get; private set; }
 
     public Guid SizeId { get; private set; }
 
