@@ -1,5 +1,6 @@
 using System.Text.RegularExpressions;
 using Pizzeria.Domain.Common;
+using Pizzeria.Domain.Menu;
 
 namespace Pizzeria.Domain.Tenancy;
 
@@ -21,6 +22,19 @@ public sealed partial class Company
     public string Slug { get; private set; } = null!;
 
     public DateTimeOffset CreatedAt { get; private set; }
+
+    /// <summary>Menu setting: how half-and-half pizzas are priced.</summary>
+    public HalfAndHalfPricing HalfAndHalfPricing { get; private set; } = HalfAndHalfPricing.MoreExpensiveHalf;
+
+    public void SetHalfAndHalfPricing(HalfAndHalfPricing pricing)
+    {
+        if (!Enum.IsDefined(pricing))
+        {
+            throw new ArgumentOutOfRangeException(nameof(pricing));
+        }
+
+        HalfAndHalfPricing = pricing;
+    }
 
     public static Company Create(string name, string slug, DateTimeOffset now)
     {
