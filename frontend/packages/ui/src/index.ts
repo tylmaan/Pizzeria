@@ -1,4 +1,4 @@
-export { Button, type ButtonProps } from './Button';
+export { Button, buttonClassName, type ButtonProps } from './Button';
 export {
   Alert,
   Checkbox,

@@ -1,6 +1,6 @@
 import { errorCodeOf, type LocationDto } from '@pizzeria/api-client';
 import { useCodeTranslations, useTranslation } from '@pizzeria/i18n';
-import { Alert, Button, Checkbox, TextField } from '@pizzeria/ui';
+import { Alert, Button, buttonClassName, Checkbox, TextField } from '@pizzeria/ui';
 import { useState, type FormEvent } from 'react';
 import { Link, useNavigate, useParams } from 'react-router';
 import { useFormErrors } from '../lib/formErrors';
@@ -97,7 +97,7 @@ function LocationForm({ existing }: { existing?: LocationDto }) {
           </Button>
           <Link
             to={listPath}
-            className="flex min-h-12 items-center rounded-lg bg-neutral-200 px-5 text-lg font-semibold hover:bg-neutral-300"
+            className={buttonClassName('secondary')}
           >
             {t('common.cancel')}
           </Link>

@@ -1,3 +1,4 @@
+import { buttonClassName } from '@pizzeria/ui';
 import type { ReactNode } from 'react';
 import { Link } from 'react-router';
 
@@ -8,7 +9,7 @@ export function PageHeader({ title, action }: { title: string; action?: { to: st
       {action && (
         <Link
           to={action.to}
-          className="flex min-h-12 items-center rounded-lg bg-orange-600 px-5 text-lg font-semibold text-white hover:bg-orange-700"
+          className={buttonClassName()}
         >
           {action.label}
         </Link>

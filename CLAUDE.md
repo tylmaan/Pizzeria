@@ -134,6 +134,14 @@ Każdy stan przed Delivered/PickedUp → Cancelled (z powodem)
 - **Pół na pół:** pizza złożona z dwóch połówek; reguła ceny konfigurowalna na poziomie firmy (domyślnie: cena droższej połówki)
 - Zestawy i promocje: **etap 2** — model projektujemy tak, żeby dało się je dodać bez przebudowy
 
+**Jak to jest zrobione (Domain/Menu):**
+- **Rozmiary należą do kategorii** (`Category.Sizes`, np. Pizza: 32/42 cm, Napoje: 0,5/1 l). „Wariant” produktu to jego cena w danym rozmiarze (`Product.Prices`); brak ceny = produkt nie występuje w tym rozmiarze.
+- **Grupa dodatków należy do jednej kategorii** (`ModifierGroup.CategoryId`), a ceny dodatków są per rozmiar tej kategorii. Produkt może mieć tylko grupy swojej kategorii. Dodatek wybiera się maksymalnie raz (bez ilości).
+- **`ItemPricing.Price(...)`** to jedyne miejsce, które zamienia wybór klienta (produkt / dwie połówki, rozmiar, dodatki) na kwotę. Sprawdza dostępność, rozmiar oraz min/max w grupach. Używane przez zamówienia (krok 5).
+- **Pół na pół:** obie połówki z tej samej kategorii, obie z `AllowsHalves`, ten sam rozmiar. Reguła ceny jest ustawieniem firmy (`Company.HalfAndHalfPricing`: droższa połówka / średnia zaokrąglona do grosza). Dodatki dotyczą całej pizzy i można wybierać tylko z grup wspólnych dla obu połówek (założenie, patrz „Otwarte decyzje”).
+- **Usuwanie:** produkty i dodatki się dezaktywuje (`IsActive`), nie usuwa. Rozmiaru, który ma ceny, nie da się usunąć (`menu.size_in_use`). Usuwania kategorii i grup na razie nie ma.
+- **Persystencja:** agregaty mają kolekcje posiadane (`OwnsMany`) w osobnych tabelach. Wiersze podrzędne mają własny klucz Guid: przy kluczu złożonym (właściciel + rozmiar) EF robi UPDATE zamiast INSERT dla nowych wierszy. Kolekcje z bazy nie mają kolejności, więc mapowanie do DTO zawsze sortuje po `SortOrder`.
+
 ### Ceny i pieniądze
 - Zawsze `decimal` w C#, `numeric(10,2)` w bazie. Nigdy `float`/`double`. Waluta: PLN.
 - **Cenę zamówienia liczy wyłącznie backend.** Frontend może pokazywać podgląd, ale API przelicza wszystko od zera i ignoruje ceny przesłane przez klienta.
@@ -293,7 +301,7 @@ Konwencje szkieletu:
 Cel: jedno zamówienie przechodzi całą drogę od klienta do dostarczenia.
 1. ✅ Szkielet repo, docker-compose, CI (build + testy)
 2. ✅ Firmy, lokale, użytkownicy, role, auth, middleware tenanta — API oraz UI: logowanie, panel firmy (lokale, pracownicy)
-3. Menu firmy: kategorie, produkty, rozmiary, modyfikatory, pół na pół (prosty edytor w panelu firmy)
+3. ✅ Menu firmy: kategorie, produkty, rozmiary, modyfikatory, pół na pół (prosty edytor w panelu firmy)
 4. Strefy dostaw lokalu + geokodowanie (fake/prosty dostawca)
 5. Sklep klienta: menu → koszyk → adres → zamówienie jako gość, płatność przy odbiorze, strona śledzenia
 6. Panel lokalu: kolejka zamówień na żywo, zamówienie telefoniczne, zmiany statusów
@@ -320,5 +328,6 @@ Cel: jedno zamówienie przechodzi całą drogę od klienta do dostarczenia.
 - [ ] Hosting produkcyjny
 - [ ] Obsługiwane modele drukarek fiskalnych i zasady wystawiania paragonów
 - [ ] Czy lokal może chwilowo wyłączać dostępność pozycji z menu (założone: tak)
-- [ ] Reguła ceny pół na pół (założone: cena droższej połówki, konfigurowalne)
+- [ ] Reguła ceny pół na pół (założone: cena droższej połówki, konfigurowalne — zrobione: droższa / średnia)
+- [ ] Dodatki przy pizzy pół na pół: na razie tylko na całą pizzę i tylko z grup wspólnych dla obu połówek. Czy potrzebne są dodatki „na połówkę” i jak je wyceniać?
 - [ ] Model rozliczeń z firmami (abonament / prowizja od zamówienia)

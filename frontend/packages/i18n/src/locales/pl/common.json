@@ -9,7 +9,8 @@
     "driver": "Kierowca",
     "locations": "Lokale",
     "staff": "Pracownicy",
-    "mainMenu": "Menu główne"
+    "mainMenu": "Menu główne",
+    "menu": "Menu"
   },
   "placeholder": {
     "comingSoon": "Ta sekcja jest w budowie.",
@@ -30,7 +31,9 @@
     "loading": "Ładowanie…",
     "retry": "Spróbuj ponownie",
     "active": "Aktywny",
-    "inactive": "Nieaktywny"
+    "inactive": "Nieaktywny",
+    "remove": "Usuń",
+    "saved": "Zapisano."
   },
   "locations": {
     "title": "Lokale",
@@ -98,6 +101,27 @@
       "role_not_assignable": "Nie możesz nadać tej roli.",
       "locations_required": "Wybierz przynajmniej jeden lokal.",
       "locations_not_allowed": "Ta rola nie jest przypisywana do lokali."
+    },
+    "menu": {
+      "category_not_found": "Nie znaleziono kategorii.",
+      "product_not_found": "Nie znaleziono produktu.",
+      "modifier_group_not_found": "Nie znaleziono grupy dodatków.",
+      "size_in_use": "Nie można usunąć rozmiaru, który ma ceny produktów lub dodatków. Najpierw usuń te ceny.",
+      "invalid_name": "Nieprawidłowa nazwa.",
+      "invalid_price": "Nieprawidłowa cena.",
+      "sizes_required": "Kategoria musi mieć co najmniej jeden rozmiar.",
+      "too_many_sizes": "Za dużo rozmiarów.",
+      "duplicate_size_name": "Nazwy rozmiarów nie mogą się powtarzać.",
+      "unknown_size": "Nieznany rozmiar.",
+      "prices_required": "Podaj cenę dla co najmniej jednego rozmiaru.",
+      "category_mismatch": "Grupa dodatków należy do innej kategorii.",
+      "invalid_selection_limits": "Nieprawidłowe limity wyboru.",
+      "unknown_modifier": "Nieznany dodatek.",
+      "product_unavailable": "Produkt jest niedostępny.",
+      "size_unavailable": "Produkt nie występuje w tym rozmiarze.",
+      "halves_not_allowed": "Tego produktu nie można zamówić pół na pół.",
+      "modifier_unavailable": "Ten dodatek jest niedostępny.",
+      "modifier_selection_invalid": "Nieprawidłowy wybór dodatków."
     }
   },
   "validation": {
@@ -115,6 +139,59 @@
     "regular_expression": "Nieprawidłowy format.",
     "password_too_short": "Hasło musi mieć co najmniej 8 znaków.",
     "password_requires_digit": "Hasło musi zawierać cyfrę.",
-    "invalid_user_name": "Nieprawidłowy login."
+    "invalid_user_name": "Nieprawidłowy login.",
+    "price": "Cena: liczba ≥ 0, maks. 2 miejsca po przecinku.",
+    "prices_required": "Podaj cenę dla co najmniej jednego rozmiaru.",
+    "too_many": "Za dużo pozycji.",
+    "max_below_min": "Maksimum nie może być mniejsze niż minimum.",
+    "min_above_modifier_count": "Minimum nie może przekraczać liczby dodatków.",
+    "greater_than_or_equal": "Za mała wartość.",
+    "less_than_or_equal": "Za duża wartość."
+  },
+  "menu": {
+    "title": "Menu",
+    "addCategory": "Dodaj kategorię",
+    "editCategory": "Edytuj kategorię",
+    "newCategoryTitle": "Nowa kategoria",
+    "editCategoryTitle": "Edycja kategorii",
+    "categoryName": "Nazwa kategorii",
+    "sizes": "Rozmiary",
+    "sizesHint": "Np. 32 cm, 42 cm albo 0,5 l. Produkty i dodatki mają osobną cenę dla każdego rozmiaru.",
+    "sizeName": "Rozmiar {{number}}",
+    "addSize": "Dodaj rozmiar",
+    "products": "Produkty",
+    "addProduct": "Dodaj produkt",
+    "newProductTitle": "Nowy produkt",
+    "editProductTitle": "Edycja produktu",
+    "category": "Kategoria",
+    "productName": "Nazwa produktu",
+    "description": "Opis (skład)",
+    "allowsHalves": "Można zamówić pół na pół",
+    "productActive": "Produkt dostępny w sprzedaży",
+    "prices": "Ceny",
+    "pricesHint": "Zostaw puste, jeśli produkt nie występuje w danym rozmiarze.",
+    "modifierGroups": "Grupy dodatków",
+    "noModifierGroups": "Ta kategoria nie ma jeszcze grup dodatków.",
+    "addModifierGroup": "Dodaj grupę dodatków",
+    "newModifierGroupTitle": "Nowa grupa dodatków",
+    "editModifierGroupTitle": "Edycja grupy dodatków",
+    "groupName": "Nazwa grupy",
+    "minSelect": "Minimum wyborów",
+    "minSelectHint": "0 = dodatki opcjonalne, 1 = klient musi coś wybrać (np. sos).",
+    "maxSelect": "Maksimum wyborów",
+    "modifiers": "Dodatki",
+    "modifierName": "Nazwa dodatku",
+    "modifierActive": "Dostępny",
+    "addModifier": "Dodaj dodatek",
+    "selection": "wybór {{min}}–{{max}}",
+    "inactive": "niedostępny",
+    "halves": "pół na pół",
+    "empty": "Menu jest puste. Zacznij od dodania kategorii, np. „Pizza” z rozmiarami.",
+    "emptyCategory": "Brak produktów w tej kategorii.",
+    "halfAndHalfPricing": "Cena pizzy pół na pół",
+    "halfAndHalf": {
+      "MoreExpensiveHalf": "cena droższej połówki",
+      "AverageOfHalves": "średnia cen obu połówek"
+    }
   }
 }

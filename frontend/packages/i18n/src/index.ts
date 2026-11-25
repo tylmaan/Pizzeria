@@ -50,5 +50,18 @@ export function useCodeTranslations() {
   };
 }
 
+const moneyFormats = new Map<string, Intl.NumberFormat>();
+
+/** Amount in PLN formatted for the current language, e.g. `25,50 zł`. Accepts API decimals (number or string). */
+export function formatMoney(amount: number | string): string {
+  const language = i18n.language || defaultLanguage;
+  let format = moneyFormats.get(language);
+  if (!format) {
+    format = new Intl.NumberFormat(language, { style: 'currency', currency: 'PLN' });
+    moneyFormats.set(language, format);
+  }
+  return format.format(Number(amount));
+}
+
 export { i18n };
 export { Trans, useTranslation } from 'react-i18next';

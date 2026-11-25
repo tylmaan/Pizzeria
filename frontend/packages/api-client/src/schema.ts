@@ -397,6 +397,320 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/menu": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["MenuDto"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/menu/settings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["MenuSettingsDto"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["MenuSettingsDto"];
+                    };
+                };
+            };
+        };
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/menu/categories": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["SaveCategoryRequest"];
+                };
+            };
+            responses: {
+                /** @description Created */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["CategoryDto"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/menu/categories/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["SaveCategoryRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["CategoryDto"];
+                    };
+                };
+            };
+        };
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/menu/products": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["SaveProductRequest"];
+                };
+            };
+            responses: {
+                /** @description Created */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProductDto"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/menu/products/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["SaveProductRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProductDto"];
+                    };
+                };
+            };
+        };
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/menu/modifier-groups": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["SaveModifierGroupRequest"];
+                };
+            };
+            responses: {
+                /** @description Created */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ModifierGroupDto"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/menu/modifier-groups/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["SaveModifierGroupRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ModifierGroupDto"];
+                    };
+                };
+            };
+        };
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -416,6 +730,12 @@ export interface components {
         AssignableRoleDto: {
             role: string;
             requiresLocations: boolean;
+        };
+        CategoryDto: {
+            /** Format: uuid */
+            id: string;
+            name: string;
+            sizes: components["schemas"]["SizeDto"][];
         };
         CompanyDto: {
             /** Format: uuid */
@@ -444,6 +764,8 @@ export interface components {
             role: string;
             locationIds: null | string[];
         };
+        /** @enum {unknown} */
+        HalfAndHalfPricing: "MoreExpensiveHalf" | "AverageOfHalves";
         LocationDto: {
             /** Format: uuid */
             id: string;
@@ -456,6 +778,15 @@ export interface components {
             email: string;
             password: string;
         };
+        MenuDto: {
+            halfAndHalfPricing: components["schemas"]["HalfAndHalfPricing"];
+            categories: components["schemas"]["CategoryDto"][];
+            products: components["schemas"]["ProductDto"][];
+            modifierGroups: components["schemas"]["ModifierGroupDto"][];
+        };
+        MenuSettingsDto: {
+            halfAndHalfPricing: components["schemas"]["HalfAndHalfPricing"];
+        };
         MeResponse: {
             /** Format: uuid */
             userId: string;
@@ -466,6 +797,38 @@ export interface components {
             roles: string[];
             locationIds: string[];
         };
+        ModifierDto: {
+            /** Format: uuid */
+            id: string;
+            name: string;
+            isActive: boolean;
+            prices: components["schemas"]["PriceDto"][];
+        };
+        ModifierGroupDto: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            categoryId: string;
+            name: string;
+            /** Format: int32 */
+            minSelect: number | string;
+            /** Format: int32 */
+            maxSelect: number | string;
+            modifiers: components["schemas"]["ModifierDto"][];
+        };
+        ModifierInput: {
+            /** Format: uuid */
+            id: null | string;
+            name: string;
+            isActive: boolean;
+            prices: components["schemas"]["PriceDto"][];
+        };
+        PriceDto: {
+            /** Format: uuid */
+            sizeId: string;
+            /** Format: double */
+            price: number | string;
+        };
         ProblemDetails: {
             type?: null | string;
             title?: null | string;
@@ -474,8 +837,54 @@ export interface components {
             detail?: null | string;
             instance?: null | string;
         };
+        ProductDto: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            categoryId: string;
+            name: string;
+            description: null | string;
+            isActive: boolean;
+            allowsHalves: boolean;
+            prices: components["schemas"]["PriceDto"][];
+            modifierGroupIds: string[];
+        };
         RefreshRequest: {
             refreshToken: string;
+        };
+        SaveCategoryRequest: {
+            name: string;
+            sizes: components["schemas"]["SizeInput"][];
+        };
+        SaveModifierGroupRequest: {
+            /** Format: uuid */
+            categoryId: string;
+            name: string;
+            /** Format: int32 */
+            minSelect: number | string;
+            /** Format: int32 */
+            maxSelect: number | string;
+            modifiers: components["schemas"]["ModifierInput"][];
+        };
+        SaveProductRequest: {
+            /** Format: uuid */
+            categoryId: string;
+            name: string;
+            description: null | string;
+            allowsHalves: boolean;
+            isActive: boolean;
+            prices: components["schemas"]["PriceDto"][];
+            modifierGroupIds: string[];
+        };
+        SizeDto: {
+            /** Format: uuid */
+            id: string;
+            name: string;
+        };
+        SizeInput: {
+            /** Format: uuid */
+            id: null | string;
+            name: string;
         };
         UpdateLocationRequest: {
             name: string;

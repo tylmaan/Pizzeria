@@ -8,17 +8,18 @@ const variantClasses: Record<Variant, string> = {
   danger: 'bg-red-700 text-white hover:bg-red-800',
 };
 
+/**
+ * Large touch target (min 48 px) — staff often work with gloves or floury hands.
+ * Exported so router links can look like buttons without this package depending on the router.
+ */
+export function buttonClassName(variant: Variant = 'primary', className = ''): string {
+  return `inline-flex min-h-12 min-w-12 items-center justify-center rounded-lg px-5 text-lg font-semibold disabled:opacity-50 ${variantClasses[variant]} ${className}`;
+}
+
 export type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
   variant?: Variant;
 };
 
-/** Large touch target (min 48 px) — staff often work with gloves or floury hands. */
 export function Button({ variant = 'primary', className = '', type = 'button', ...props }: ButtonProps) {
-  return (
-    <button
-      type={type}
-      className={`min-h-12 min-w-12 rounded-lg px-5 text-lg font-semibold disabled:opacity-50 ${variantClasses[variant]} ${className}`}
-      {...props}
-    />
-  );
+  return <button type={type} className={buttonClassName(variant, className)} {...props} />;
 }

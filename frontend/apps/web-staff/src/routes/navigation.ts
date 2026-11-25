@@ -2,7 +2,7 @@ import { Roles, type Role } from '@pizzeria/api-client';
 
 export type NavItem = {
   to: string;
-  labelKey: 'nav.orders' | 'nav.kitchen' | 'nav.driver' | 'nav.locations' | 'nav.staff';
+  labelKey: 'nav.orders' | 'nav.kitchen' | 'nav.driver' | 'nav.locations' | 'nav.menu' | 'nav.staff';
   roles: readonly Role[];
 };
 
@@ -12,6 +12,7 @@ export const navItems: readonly NavItem[] = [
   { to: '/kitchen', labelKey: 'nav.kitchen', roles: [Roles.LocationManager, Roles.Staff, Roles.Kitchen] },
   { to: '/driver', labelKey: 'nav.driver', roles: [Roles.Driver] },
   { to: '/company/locations', labelKey: 'nav.locations', roles: [Roles.CompanyAdmin] },
+  { to: '/company/menu', labelKey: 'nav.menu', roles: [Roles.CompanyAdmin] },
   { to: '/company/staff', labelKey: 'nav.staff', roles: [Roles.CompanyAdmin, Roles.LocationManager] },
 ];
 
