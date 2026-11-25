@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Pizzeria.Application.Delivery;
 using Pizzeria.Application.Tenancy;
 using Pizzeria.Application.Users;
 using Pizzeria.Domain.Identity;
@@ -110,6 +111,9 @@ public static partial class DatabaseInitializer
 
         provider.GetRequiredService<TenantContext>().SetSystemForCompany(company.Id);
         var location = Location.Create(company.Id, "Demo Pizza Centrum", new Address("ul. Lipowa 1", "15-001", "Białystok"), null, now);
+        var geocoded = await provider.GetRequiredService<IGeocodingService>()
+            .GeocodeAsync(new AddressQuery("ul. Lipowa 1", "15-001", "Białystok"), ct).ConfigureAwait(false);
+        location.SetPosition(geocoded?.Point);
         db.Locations.Add(location);
         await db.SaveChangesAsync(ct).ConfigureAwait(false);
 

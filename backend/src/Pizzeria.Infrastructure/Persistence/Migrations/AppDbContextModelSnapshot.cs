@@ -408,6 +408,10 @@ namespace Pizzeria.Infrastructure.Persistence.Migrations
                         .HasColumnType("character varying(200)")
                         .HasColumnName("name");
 
+                    b.Property<Point>("Position")
+                        .HasColumnType("geometry(Point, 4326)")
+                        .HasColumnName("position");
+
                     b.Property<string>("TimeZoneId")
                         .IsRequired()
                         .HasMaxLength(64)

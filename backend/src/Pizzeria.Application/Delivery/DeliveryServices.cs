@@ -112,7 +112,7 @@ public sealed class DeliveryCheckService(
         var pointDto = GeoPointDto.From(address.Point);
         if (zone is null)
         {
-            return new DeliveryQuoteDto(false, pointDto, address.FormattedAddress, null, null, null, null, null, null);
+            return new DeliveryQuoteDto(false, pointDto, address.FormattedAddress, null, null, null, null, null, null, null);
         }
 
         return new DeliveryQuoteDto(
@@ -122,6 +122,7 @@ public sealed class DeliveryCheckService(
             zone.LocationId,
             candidates.First(c => c.Zone == zone).LocationName,
             zone.Id,
+            zone.Name,
             zone.DeliveryFee,
             zone.MinOrderValue,
             zone.EstimatedMinutes);

@@ -154,6 +154,24 @@ public sealed class DeliveryTests(PizzeriaApiFactory factory)
     }
 
     [Fact]
+    public async Task Location_IsGeocodedOnCreateAndAddressChange()
+    {
+        var tenant = await factory.CreateCompanyAsync("zone");
+        var first = factory.Geocoder.Place(_lat, Lon);
+        var moved = factory.Geocoder.Place(_lat + 0.2, Lon);
+
+        using var created = await tenant.Admin.PostAsJsonAsync("/api/locations",
+            new CreateLocationRequest("Centrum", new AddressDto(first, "00-001", "Warszawa"), null));
+        var location = (await created.Content.ReadFromJsonAsync<LocationDto>())!;
+        using var updated = await tenant.Admin.PutAsJsonAsync($"/api/locations/{location.Id}",
+            new UpdateLocationRequest("Centrum", new AddressDto(moved, "00-001", "Warszawa"), "Europe/Warsaw", true));
+        var relocated = (await updated.Content.ReadFromJsonAsync<LocationDto>())!;
+
+        Assert.Equal(new GeoPointDto(_lat, Lon), location.Position);
+        Assert.Equal(new GeoPointDto(_lat + 0.2, Lon), relocated.Position);
+    }
+
+    [Fact]
     public async Task Zone_SelfIntersectingBoundary_Returns422()
     {
         var tenant = await factory.CreateCompanyAsync("zone");

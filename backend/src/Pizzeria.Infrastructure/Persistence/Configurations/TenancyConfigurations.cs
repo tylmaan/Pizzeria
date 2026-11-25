@@ -1,6 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Pizzeria.Domain.Delivery;
 using Pizzeria.Domain.Tenancy;
+using Location = Pizzeria.Domain.Tenancy.Location;
 
 namespace Pizzeria.Infrastructure.Persistence.Configurations;
 
@@ -25,6 +27,7 @@ internal sealed class LocationConfiguration : IEntityTypeConfiguration<Location>
         builder.HasKey(l => l.Id);
         builder.Property(l => l.Name).HasMaxLength(Location.NameMaxLength).IsRequired();
         builder.Property(l => l.TimeZoneId).HasMaxLength(64).IsRequired();
+        builder.Property(l => l.Position).HasColumnType($"geometry(Point, {Geo.Srid})");
 
         builder.OwnsOne(l => l.Address, address =>
         {

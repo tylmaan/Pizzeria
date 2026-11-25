@@ -1,6 +1,6 @@
 import { errorCodeOf } from '@pizzeria/api-client';
 import { useCodeTranslations, useTranslation } from '@pizzeria/i18n';
-import { Alert } from '@pizzeria/ui';
+import { Alert, buttonClassName } from '@pizzeria/ui';
 import { Link } from 'react-router';
 import { PageHeader, QueryState } from './PageHeader';
 import { useLocations } from './queries';
@@ -18,10 +18,10 @@ export function LocationsPage() {
       {locations.data?.length === 0 && <QueryState>{t('locations.empty')}</QueryState>}
       <ul className="flex flex-col gap-2">
         {locations.data?.map((location) => (
-          <li key={location.id}>
+          <li key={location.id} className="flex flex-wrap items-center gap-2 rounded-lg bg-white pr-3 shadow-sm">
             <Link
               to={`/company/locations/${location.id}`}
-              className="flex min-h-16 flex-wrap items-center justify-between gap-2 rounded-lg bg-white px-4 py-3 shadow-sm hover:bg-orange-50"
+              className="flex min-h-16 flex-1 flex-wrap items-center justify-between gap-2 rounded-lg px-4 py-3 hover:bg-orange-50"
             >
               <span>
                 <span className="block text-xl font-semibold">{location.name}</span>
@@ -30,6 +30,9 @@ export function LocationsPage() {
                 </span>
               </span>
               <StatusBadge active={location.isActive} />
+            </Link>
+            <Link to={`/company/locations/${location.id}/zones`} className={buttonClassName('secondary')}>
+              {t('zones.link')}
             </Link>
           </li>
         ))}

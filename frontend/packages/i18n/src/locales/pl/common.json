@@ -122,6 +122,14 @@
       "halves_not_allowed": "Tego produktu nie można zamówić pół na pół.",
       "modifier_unavailable": "Ten dodatek jest niedostępny.",
       "modifier_selection_invalid": "Nieprawidłowy wybór dodatków."
+    },
+    "delivery": {
+      "zone_not_found": "Nie znaleziono strefy dostaw.",
+      "address_not_found": "Nie znaleziono adresu. Sprawdź ulicę, kod i miasto.",
+      "shop_not_found": "Nie rozpoznano sklepu.",
+      "invalid_boundary": "Nieprawidłowa granica strefy (np. linie się przecinają).",
+      "invalid_estimate": "Czas dostawy musi być od 1 do 600 minut.",
+      "invalid_name": "Nieprawidłowa nazwa strefy."
     }
   },
   "validation": {
@@ -146,7 +154,10 @@
     "max_below_min": "Maksimum nie może być mniejsze niż minimum.",
     "min_above_modifier_count": "Minimum nie może przekraczać liczby dodatków.",
     "greater_than_or_equal": "Za mała wartość.",
-    "less_than_or_equal": "Za duża wartość."
+    "less_than_or_equal": "Za duża wartość.",
+    "boundary": "Strefa musi mieć od 3 do 500 punktów.",
+    "coordinates": "Nieprawidłowe współrzędne.",
+    "inclusive_between": "Wartość poza dozwolonym zakresem."
   },
   "menu": {
     "title": "Menu",
@@ -193,5 +204,29 @@
       "MoreExpensiveHalf": "cena droższej połówki",
       "AverageOfHalves": "średnia cen obu połówek"
     }
+  },
+  "zones": {
+    "title": "Strefy dostaw: {{location}}",
+    "link": "Strefy dostaw",
+    "add": "Dodaj strefę",
+    "newTitle": "Nowa strefa dostaw",
+    "editTitle": "Edycja strefy dostaw",
+    "name": "Nazwa strefy",
+    "deliveryFee": "Cena dostawy (zł)",
+    "minOrderValue": "Minimalne zamówienie (zł)",
+    "estimatedMinutes": "Szacowany czas dostawy (min)",
+    "isActive": "Strefa aktywna",
+    "empty": "Ten lokal nie ma jeszcze stref dostaw.",
+    "summary": "dostawa {{fee}} · min. {{min}} · ok. {{minutes}} min",
+    "drawHint": "Klikaj na mapie, aby wyznaczyć granicę strefy (min. 3 punkty).",
+    "points": "Punkty granicy: {{count}}",
+    "undoPoint": "Cofnij punkt",
+    "clear": "Wyczyść",
+    "boundaryRequired": "Wyznacz na mapie co najmniej 3 punkty.",
+    "map": "Mapa stref dostaw",
+    "checkTitle": "Sprawdź adres",
+    "check": "Sprawdź",
+    "delivers": "Dowozimy: {{location}}, strefa „{{zone}}”, dostawa {{fee}}, min. zamówienie {{min}}, ok. {{minutes}} min.",
+    "noDelivery": "Ten adres jest poza strefami dostaw."
   }
 }

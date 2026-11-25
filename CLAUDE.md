@@ -152,6 +152,14 @@ Każdy stan przed Delivered/PickedUp → Cancelled (z powodem)
 - Adres klienta → geokodowanie → punkt → sprawdzenie, w której strefie i którego lokalu leży
 - Geokodowanie za interfejsem `IGeocodingService` (dostawca do wyboru — patrz „Otwarte decyzje”)
 
+**Jak to jest zrobione (Domain/Delivery):**
+- `DeliveryZone.Area` to `geometry(Polygon, 4326)` z indeksem GiST. Granica jest walidowana: min. 3 punkty, bez samoprzecięć, niezerowe pole. Pierwszy punkt się nie powtarza, pierścień zamyka domena.
+- Gdy strefy się nakładają (także strefy różnych lokali), wygrywa **najmniejsza** (`DeliveryZone.PickFor`). Liczą się tylko aktywne strefy aktywnych lokali.
+- `POST /api/delivery/check` (adres → `Delivers`, lokal, strefa, cena dostawy, minimum, czas) działa dla obsługi i anonimowo dla sklepu (tenant z subdomeny). Ma limit zapytań, bo prawdziwy geokoder kosztuje.
+- `FakeGeocodingService` mapuje adres deterministycznie na punkt w promieniu `Geocoding:Fake:RadiusKm` od `Geocoding:Fake:Center*` (domyślnie centrum Białegostoku). Testy integracyjne podmieniają go na `StubGeocoder`.
+- `Location.Position` jest geokodowana przy tworzeniu lokalu i przy zmianie adresu (best effort, może być `null`) i służy jako środek mapy.
+- **Edytor stref:** Leaflet bez wrappera i bez pluginu do rysowania; kliknięcie na mapie dodaje punkt. Kafelki z tile.openstreetmap.org tylko do developmentu. W testach UI `ZoneMap` jest podmieniany (`vi.mock`).
+
 ### Kierowcy
 - **Lista kursów:** przypisane zamówienia, adres, telefon do klienta (przycisk „zadzwoń”), forma płatności i kwota do pobrania, przycisk otwierający nawigację w Google Maps
 - **Statusy:** „Odebrałem z lokalu” → „Dostarczone” (jednym kliknięciem, duże przyciski)
@@ -302,7 +310,7 @@ Cel: jedno zamówienie przechodzi całą drogę od klienta do dostarczenia.
 1. ✅ Szkielet repo, docker-compose, CI (build + testy)
 2. ✅ Firmy, lokale, użytkownicy, role, auth, middleware tenanta — API oraz UI: logowanie, panel firmy (lokale, pracownicy)
 3. ✅ Menu firmy: kategorie, produkty, rozmiary, modyfikatory, pół na pół (prosty edytor w panelu firmy)
-4. Strefy dostaw lokalu + geokodowanie (fake/prosty dostawca)
+4. ✅ Strefy dostaw lokalu + geokodowanie (fake/prosty dostawca)
 5. Sklep klienta: menu → koszyk → adres → zamówienie jako gość, płatność przy odbiorze, strona śledzenia
 6. Panel lokalu: kolejka zamówień na żywo, zamówienie telefoniczne, zmiany statusów
 7. Ekran kuchni
@@ -326,6 +334,8 @@ Cel: jedno zamówienie przechodzi całą drogę od klienta do dostarczenia.
 - [ ] Operator płatności online (Przelewy24 / PayU / inny)
 - [ ] Dostawca geokodowania adresów (Google Maps / Mapbox / Nominatim-OSM — koszt vs jakość polskich adresów)
 - [ ] Hosting produkcyjny
+- [ ] Dostawca kafelków mapy na produkcję (tile.openstreetmap.org nie jest do ruchu produkcyjnego; np. MapTiler, Stadia, własny serwer)
+- [ ] Kierownik lokalu może zarządzać strefami swojego lokalu przez API, ale w panelu nie ma jeszcze dla niego wejścia (link jest na liście lokali, którą widzi tylko administrator firmy)
 - [ ] Obsługiwane modele drukarek fiskalnych i zasady wystawiania paragonów
 - [ ] Czy lokal może chwilowo wyłączać dostępność pozycji z menu (założone: tak)
 - [ ] Reguła ceny pół na pół (założone: cena droższej połówki, konfigurowalne — zrobione: droższa / średnia)

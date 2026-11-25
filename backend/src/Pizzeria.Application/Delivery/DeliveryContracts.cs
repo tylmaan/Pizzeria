@@ -48,6 +48,7 @@ public sealed record DeliveryQuoteDto(
     Guid? LocationId,
     string? LocationName,
     Guid? ZoneId,
+    string? ZoneName,
     decimal? DeliveryFee,
     decimal? MinOrderValue,
     int? EstimatedMinutes);

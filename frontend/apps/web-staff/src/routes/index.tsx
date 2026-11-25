@@ -10,6 +10,8 @@ import { EditCategoryPage, NewCategoryPage } from '../menu/CategoryFormPage';
 import { MenuPage } from '../menu/MenuPage';
 import { EditModifierGroupPage, NewModifierGroupPage } from '../menu/ModifierGroupFormPage';
 import { EditProductPage, NewProductPage } from '../menu/ProductFormPage';
+import { ZoneFormPage } from '../zones/ZoneFormPage';
+import { ZonesPage } from '../zones/ZonesPage';
 import { navItems } from './navigation';
 import { Layout, StartPage } from './Layout';
 import { Placeholder } from './Placeholder';
@@ -58,6 +60,16 @@ export const routes: RouteObject[] = [
           { index: true, element: <LocationsPage /> },
           { path: 'new', element: <NewLocationPage /> },
           { path: ':id', element: <EditLocationPage /> },
+        ],
+      },
+      {
+        // Zones are also managed by location managers (the API limits them to their own locations).
+        path: 'company/locations/:locationId/zones',
+        element: <RequireRole roles={[Roles.CompanyAdmin, Roles.LocationManager]} />,
+        children: [
+          { index: true, element: <ZonesPage /> },
+          { path: 'new', element: <ZoneFormPage /> },
+          { path: ':zoneId', element: <ZoneFormPage /> },
         ],
       },
       {

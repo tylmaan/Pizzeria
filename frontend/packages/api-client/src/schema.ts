@@ -711,6 +711,149 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/locations/{locationId}/delivery-zones": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    locationId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["DeliveryZoneDto"][];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    locationId: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["SaveDeliveryZoneRequest"];
+                };
+            };
+            responses: {
+                /** @description Created */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["DeliveryZoneDto"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/locations/{locationId}/delivery-zones/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    locationId: string;
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["SaveDeliveryZoneRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["DeliveryZoneDto"];
+                    };
+                };
+            };
+        };
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/delivery/check": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["DeliveryCheckRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["DeliveryQuoteDto"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -764,6 +907,49 @@ export interface components {
             role: string;
             locationIds: null | string[];
         };
+        DeliveryCheckRequest: {
+            street: string;
+            postalCode: string;
+            city: string;
+        };
+        DeliveryQuoteDto: {
+            delivers: boolean;
+            point: components["schemas"]["GeoPointDto"];
+            formattedAddress: string;
+            /** Format: uuid */
+            locationId: null | string;
+            locationName: null | string;
+            /** Format: uuid */
+            zoneId: null | string;
+            zoneName: null | string;
+            /** Format: double */
+            deliveryFee: null | number | string;
+            /** Format: double */
+            minOrderValue: null | number | string;
+            /** Format: int32 */
+            estimatedMinutes: null | number | string;
+        };
+        DeliveryZoneDto: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            locationId: string;
+            name: string;
+            boundary: components["schemas"]["GeoPointDto"][];
+            /** Format: double */
+            deliveryFee: number | string;
+            /** Format: double */
+            minOrderValue: number | string;
+            /** Format: int32 */
+            estimatedMinutes: number | string;
+            isActive: boolean;
+        };
+        GeoPointDto: {
+            /** Format: double */
+            latitude: number | string;
+            /** Format: double */
+            longitude: number | string;
+        };
         /** @enum {unknown} */
         HalfAndHalfPricing: "MoreExpensiveHalf" | "AverageOfHalves";
         LocationDto: {
@@ -773,6 +959,7 @@ export interface components {
             address: components["schemas"]["AddressDto"];
             timeZoneId: string;
             isActive: boolean;
+            position: null | components["schemas"]["GeoPointDto"];
         };
         LoginRequest: {
             email: string;
@@ -855,6 +1042,17 @@ export interface components {
         SaveCategoryRequest: {
             name: string;
             sizes: components["schemas"]["SizeInput"][];
+        };
+        SaveDeliveryZoneRequest: {
+            name: string;
+            boundary: components["schemas"]["GeoPointDto"][];
+            /** Format: double */
+            deliveryFee: number | string;
+            /** Format: double */
+            minOrderValue: number | string;
+            /** Format: int32 */
+            estimatedMinutes: number | string;
+            isActive: boolean;
         };
         SaveModifierGroupRequest: {
             /** Format: uuid */

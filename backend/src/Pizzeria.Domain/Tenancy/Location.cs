@@ -1,4 +1,6 @@
+using NetTopologySuite.Geometries;
 using Pizzeria.Domain.Common;
+using Pizzeria.Domain.Delivery;
 
 namespace Pizzeria.Domain.Tenancy;
 
@@ -26,6 +28,11 @@ public sealed class Location : ITenantEntity
     public bool IsActive { get; private set; }
 
     public DateTimeOffset CreatedAt { get; private set; }
+
+    /// <summary>Geocoded position of the address (map centre, distances). <c>null</c> when the address was not found.</summary>
+    public Point? Position { get; private set; }
+
+    public void SetPosition(GeoPoint? position) => Position = position?.ToPoint();
 
     public static Location Create(Guid companyId, string name, Address address, string? timeZoneId, DateTimeOffset now)
     {

@@ -1,6 +1,7 @@
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using Pizzeria.Application.Abstractions;
+using Pizzeria.Application.Delivery;
 using Pizzeria.Application.Errors;
 using Pizzeria.Application.Tenancy;
 using Pizzeria.Domain.Tenancy;
@@ -11,6 +12,7 @@ public sealed class LocationService(
     IAppDbContext db,
     ITenantContext tenant,
     TimeProvider clock,
+    IGeocodingService geocoding,
     IValidator<CreateLocationRequest> createValidator,
     IValidator<UpdateLocationRequest> updateValidator)
 {
@@ -46,6 +48,7 @@ public sealed class LocationService(
             request.TimeZoneId,
             clock.GetUtcNow());
 
+        await LocateAsync(location, ct).ConfigureAwait(false);
         db.Locations.Add(location);
         await db.SaveChangesAsync(ct).ConfigureAwait(false);
         return LocationDto.From(location);
@@ -57,7 +60,13 @@ public sealed class LocationService(
         await updateValidator.ValidateAndThrowAsync(request, ct).ConfigureAwait(false);
 
         var location = await FindAccessibleAsync(id, ct).ConfigureAwait(false);
+        var previousAddress = location.Address;
         location.Update(request.Name, request.Address.ToDomain(), request.TimeZoneId);
+        if (location.Address != previousAddress || location.Position is null)
+        {
+            await LocateAsync(location, ct).ConfigureAwait(false);
+        }
+
         if (request.IsActive)
         {
             location.Activate();
@@ -82,6 +91,15 @@ public sealed class LocationService(
 
         return await db.Locations.FirstOrDefaultAsync(l => l.Id == id, ct).ConfigureAwait(false)
             ?? throw new NotFoundException(ErrorCodes.LocationNotFound);
+    }
+
+    /// <summary>Best effort: a location whose address cannot be geocoded simply has no position.</summary>
+    private async Task LocateAsync(Location location, CancellationToken ct)
+    {
+        var address = location.Address;
+        var found = await geocoding.GeocodeAsync(new AddressQuery(address.Street, address.PostalCode, address.City), ct)
+            .ConfigureAwait(false);
+        location.SetPosition(found?.Point);
     }
 
     private void RequireCompanyAdmin()
