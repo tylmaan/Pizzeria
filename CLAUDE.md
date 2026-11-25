@@ -202,6 +202,19 @@ Zasada: SignalR tylko **powiadamia** o zmianie, źródłem prawdy jest REST API.
 - Migracje EF Core: jedna migracja na jedną logiczną zmianę, opisowa nazwa (`AddDeliveryZones`, nie `Update3`)
 - Nullable reference types włączone, ostrzeżenia traktowane jako błędy
 
+### Backend — tenancy i auth (jak to działa)
+- **Auth:** bearer tokeny ASP.NET Core Identity (nieprzezroczyste, nie JWT): access 30 min, refresh 14 dni. Endpointy `POST /api/auth/login`, `POST /api/auth/refresh`, `GET /api/auth/me`. Refresh odbudowuje claimy z bazy, a zmiana security stampu unieważnia refresh token.
+- **Claimy w tokenie:** role (`ClaimTypes.Role`), `company_id`, `location_id` (wiele), `display_name`, generowane przez `AppUserClaimsPrincipalFactory`. Zmiana ról lub lokali użytkownika = `UpdateSecurityStampAsync`.
+- **Tenant per request:** `TenantResolutionMiddleware` wypełnia scoped `TenantContext`. Zalogowany użytkownik → claimy z tokenu; anonim → subdomena sklepu (`{slug}.{Tenancy:ShopRootDomain}`, w dev `demo.localhost`). Bez tenanta filtry zwracają pustkę.
+- **Filtr globalny:** nazwany filtr `"Tenant"` (`AppDbContext.TenantFilter`) na każdej encji `ITenantEntity` i na `Company`. Dodatkowo `SaveChanges` blokuje zapis encji tenanta do innej firmy (`InvalidOperationException`).
+- **Wyjątek: `users` nie są pod filtrem globalnym**, bo Identity musi znaleźć użytkownika przy logowaniu, zanim tenant jest znany. Każde zapytanie o użytkowników poza Identity filtruje `CompanyId` jawnie (`UserAccountService`).
+- **Dostęp do lokalu:** `ITenantContext.CanAccessLocation(id)`, gdzie CompanyAdmin ma wszystkie lokale firmy, a role lokalowe tylko przypisane. Brak dostępu = 404 (nie zdradzamy istnienia zasobu).
+- **Autoryzacja:** polityka fallback wymaga zalogowania (nowy endpoint jest domyślnie chroniony, publiczne mają jawne `AllowAnonymous`). Polityki ról na endpointach (`AuthorizationPolicies`) to tylko gruba bramka; właściwe reguły są w serwisach Application.
+- **Błędy:** wyjątki `NotFoundException`/`ForbiddenException`/`ConflictException` (Application), `DomainException` (Domain) i `ValidationException` (FluentValidation, walidacja w serwisach) są mapowane przez `AppExceptionHandler` na ProblemDetails z `code`. Błędy pól: `errors: { "address.postalCode": ["validation.postal_code"] }`, a wbudowane kody FluentValidation są zamieniane na `validation.not_empty` itd. Każda odpowiedź błędu ma `code`, także 401/403/404/500 z frameworka.
+- **Baza:** nazwy tabel i kolumn w snake_case (`SnakeCaseNaming`, bez dodatkowego pakietu), `decimal` → `numeric(10,2)` konwencją, Id jako UUIDv7 (`Guid.CreateVersion7`).
+- **Start aplikacji:** `DatabaseInitializer` stosuje migracje (gdy `Database:MigrateOnStartup`, w Development włączone), zakłada role, opcjonalnie PlatformAdmina (`Seed:PlatformAdminEmail`/`Seed:PlatformAdminPassword`) i dane demo (`Seed:DemoData` + `Seed:DemoPassword`): firma `demo`, lokal „Demo Pizza Centrum”, użytkownicy `owner|manager|staff|kitchen|driver@demo.local`.
+- Na razie e-mail użytkownika jest unikalny globalnie. Konta klientów (etap 2) będą wymagały unikalności per firma — do zaprojektowania przy kontach klientów.
+
 ### Frontend
 - Komponenty funkcyjne, TypeScript `strict`
 - Żadnych tekstów w JSX — tylko `t('...')`
@@ -235,10 +248,16 @@ docker compose --profile tools up -d   # + pgAdmin na :5050
 
 # backend (API na http://localhost:5080, OpenAPI: /openapi/v1.json w Development)
 cd backend
+# jednorazowo: sekrety lokalne (nie w repo)
+dotnet user-secrets --project src/Pizzeria.Api set "ConnectionStrings:Pizzeria" "Host=localhost;Port=5432;Database=pizzeria;Username=pizzeria;Password=pizzeria"
+dotnet user-secrets --project src/Pizzeria.Api set "Seed:DemoPassword" "<hasło-min-8-znaków-z-cyfrą>"
+dotnet user-secrets --project src/Pizzeria.Api set "Seed:PlatformAdminEmail" "admin@pizzeria.local"
+dotnet user-secrets --project src/Pizzeria.Api set "Seed:PlatformAdminPassword" "<hasło>"
 dotnet build
-dotnet test
+dotnet test            # testy integracyjne wymagają działającego Dockera (Testcontainers)
 dotnet run --project src/Pizzeria.Api
-dotnet ef migrations add <Name> --project src/Pizzeria.Infrastructure --startup-project src/Pizzeria.Api
+dotnet tool restore    # dotnet-ef jako narzędzie lokalne (backend/dotnet-tools.json)
+dotnet ef migrations add <Name> --project src/Pizzeria.Infrastructure --startup-project src/Pizzeria.Api --output-dir Persistence/Migrations
 
 # frontend (web-staff :5173, web-shop :5174; /api proxowane na backend)
 cd frontend
@@ -252,7 +271,8 @@ pnpm generate:api   # typy z OpenAPI — jeszcze nie skonfigurowane
 ```
 
 Konwencje szkieletu:
-- Wersje pakietów NuGet centralnie w `backend/Directory.Packages.props`, wspólne ustawienia (net10.0, nullable, warnings as errors, analizatory) w `backend/Directory.Build.props`.
+- Wersje pakietów NuGet centralnie w `backend/Directory.Packages.props`, wspólne ustawienia (net10.0, nullable, warnings as errors, analizatory) w `backend/Directory.Build.props`. Pakiety Microsoft/EF/Npgsql trzymamy na linii **10.x** (najnowsze 11.x wymagają net11).
+- Migracje w `src/Pizzeria.Infrastructure/Persistence/Migrations` są oznaczone w `.editorconfig` jako kod generowany (bez analizatorów).
 - Endpointy API pod prefiksem `/api/...` (proxy Vite przekazuje `/api` bez przepisywania). `/health` poza prefiksem.
 - Aplikacje frontendu importują i18n wyłącznie z `@pizzeria/i18n` (re-eksport `useTranslation`), klucze tłumaczeń są typowane.
 - CI: `.github/workflows/ci.yml` — build + testy backendu i frontendu.
@@ -261,8 +281,8 @@ Konwencje szkieletu:
 
 ### Etap 1 — pełna ścieżka zamówienia (MVP)
 Cel: jedno zamówienie przechodzi całą drogę od klienta do dostarczenia.
-1. Szkielet repo, docker-compose, CI (build + testy)
-2. Firmy, lokale, użytkownicy, role, auth, middleware tenanta
+1. ✅ Szkielet repo, docker-compose, CI (build + testy)
+2. ✅ Firmy, lokale, użytkownicy, role, auth, middleware tenanta (API; UI logowania i panelu firmy razem z kolejnymi krokami)
 3. Menu firmy: kategorie, produkty, rozmiary, modyfikatory, pół na pół (prosty edytor w panelu firmy)
 4. Strefy dostaw lokalu + geokodowanie (fake/prosty dostawca)
 5. Sklep klienta: menu → koszyk → adres → zamówienie jako gość, płatność przy odbiorze, strona śledzenia

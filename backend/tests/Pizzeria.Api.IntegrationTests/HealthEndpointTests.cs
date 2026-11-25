@@ -1,10 +1,10 @@
 using System.Net;
-using Microsoft.AspNetCore.Mvc.Testing;
+using Pizzeria.Api.IntegrationTests.Infrastructure;
 
 namespace Pizzeria.Api.IntegrationTests;
 
-public sealed class HealthEndpointTests(WebApplicationFactory<Program> factory)
-    : IClassFixture<WebApplicationFactory<Program>>
+[Collection(ApiTestGroup.Name)]
+public sealed class HealthEndpointTests(PizzeriaApiFactory factory)
 {
     [Fact]
     public async Task Health_ReturnsOk()
