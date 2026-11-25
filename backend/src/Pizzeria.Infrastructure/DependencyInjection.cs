@@ -3,8 +3,10 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Pizzeria.Application.Abstractions;
+using Pizzeria.Application.Delivery;
 using Pizzeria.Application.Tenancy;
 using Pizzeria.Application.Users;
+using Pizzeria.Infrastructure.Geocoding;
 using Pizzeria.Infrastructure.Identity;
 using Pizzeria.Infrastructure.Persistence;
 using Pizzeria.Infrastructure.Tenancy;
@@ -25,7 +27,9 @@ public static class DependencyInjection
         // Single query on purpose: menus are small and one query gives a consistent snapshot of an aggregate.
         services.AddDbContext<AppDbContext>(options => options.UseNpgsql(
             connectionString,
-            npgsql => npgsql.UseQuerySplittingBehavior(QuerySplittingBehavior.SingleQuery)));
+            npgsql => npgsql
+                .UseNetTopologySuite()
+                .UseQuerySplittingBehavior(QuerySplittingBehavior.SingleQuery)));
         services.AddScoped<IAppDbContext>(sp => sp.GetRequiredService<AppDbContext>());
 
         services.Configure<DatabaseOptions>(configuration.GetSection(DatabaseOptions.SectionName));
@@ -34,6 +38,10 @@ public static class DependencyInjection
         services.AddMemoryCache();
         services.AddScoped<ICompanyResolver, CompanyResolver>();
         services.AddScoped<IUserAccountService, UserAccountService>();
+
+        services.Configure<GeocodingOptions>(configuration.GetSection(GeocodingOptions.SectionName));
+        // The real geocoding provider is an open decision (CLAUDE.md); the fake is the only implementation so far.
+        services.AddSingleton<IGeocodingService, FakeGeocodingService>();
 
         return services
             .AddIdentityCore<AppUser>(options =>

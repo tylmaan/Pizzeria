@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using NetTopologySuite.Geometries;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Pizzeria.Infrastructure.Persistence;
 
@@ -20,6 +21,7 @@ namespace Pizzeria.Infrastructure.Persistence.Migrations
                 .HasAnnotation("ProductVersion", "10.0.15")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
+            NpgsqlModelBuilderExtensions.HasPostgresExtension(modelBuilder, "postgis");
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
@@ -150,6 +152,71 @@ namespace Pizzeria.Infrastructure.Persistence.Migrations
                         .HasName("pk_user_tokens");
 
                     b.ToTable("user_tokens", (string)null);
+                });
+
+            modelBuilder.Entity("Pizzeria.Domain.Delivery.DeliveryZone", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<Polygon>("Area")
+                        .IsRequired()
+                        .HasColumnType("geometry(Polygon, 4326)")
+                        .HasColumnName("area");
+
+                    b.Property<Guid>("CompanyId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("company_id");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<decimal>("DeliveryFee")
+                        .HasPrecision(10, 2)
+                        .HasColumnType("numeric(10,2)")
+                        .HasColumnName("delivery_fee");
+
+                    b.Property<int>("EstimatedMinutes")
+                        .HasColumnType("integer")
+                        .HasColumnName("estimated_minutes");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_active");
+
+                    b.Property<Guid>("LocationId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("location_id");
+
+                    b.Property<decimal>("MinOrderValue")
+                        .HasPrecision(10, 2)
+                        .HasColumnType("numeric(10,2)")
+                        .HasColumnName("min_order_value");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("name");
+
+                    b.HasKey("Id")
+                        .HasName("pk_delivery_zones");
+
+                    b.HasIndex("Area")
+                        .HasDatabaseName("ix_delivery_zones_area");
+
+                    NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex("Area"), "gist");
+
+                    b.HasIndex("CompanyId")
+                        .HasDatabaseName("ix_delivery_zones_company_id");
+
+                    b.HasIndex("LocationId")
+                        .HasDatabaseName("ix_delivery_zones_location_id");
+
+                    b.ToTable("delivery_zones", (string)null);
                 });
 
             modelBuilder.Entity("Pizzeria.Domain.Menu.Category", b =>
@@ -560,6 +627,23 @@ namespace Pizzeria.Infrastructure.Persistence.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("fk_user_tokens_users_user_id");
+                });
+
+            modelBuilder.Entity("Pizzeria.Domain.Delivery.DeliveryZone", b =>
+                {
+                    b.HasOne("Pizzeria.Domain.Tenancy.Company", null)
+                        .WithMany()
+                        .HasForeignKey("CompanyId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_delivery_zones_companies_company_id");
+
+                    b.HasOne("Pizzeria.Domain.Tenancy.Location", null)
+                        .WithMany()
+                        .HasForeignKey("LocationId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_delivery_zones_locations_location_id");
                 });
 
             modelBuilder.Entity("Pizzeria.Domain.Menu.Category", b =>

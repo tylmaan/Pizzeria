@@ -11,6 +11,9 @@
     <PackageVersion Include="Microsoft.EntityFrameworkCore" Version="10.0.12" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.12" />
     <PackageVersion Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.4" />
+    <PackageVersion Include="Npgsql.EntityFrameworkCore.PostgreSQL.NetTopologySuite" Version="10.0.4" />
+    <!-- Geometry (delivery zones); Domain uses NTS types directly -->
+    <PackageVersion Include="NetTopologySuite" Version="2.6.0" />
     <PackageVersion Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="10.0.12" />
     <!-- Validation -->
     <PackageVersion Include="FluentValidation" Version="12.2.0" />

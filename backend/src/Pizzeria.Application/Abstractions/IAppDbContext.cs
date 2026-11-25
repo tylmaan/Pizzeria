@@ -1,7 +1,9 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Pizzeria.Domain.Delivery;
 using Pizzeria.Domain.Menu;
 using Pizzeria.Domain.Tenancy;
+using Location = Pizzeria.Domain.Tenancy.Location;
 
 namespace Pizzeria.Application.Abstractions;
 
@@ -20,6 +22,8 @@ public interface IAppDbContext
     DbSet<Product> Products { get; }
 
     DbSet<ModifierGroup> ModifierGroups { get; }
+
+    DbSet<DeliveryZone> DeliveryZones { get; }
 
     DatabaseFacade Database { get; }
 

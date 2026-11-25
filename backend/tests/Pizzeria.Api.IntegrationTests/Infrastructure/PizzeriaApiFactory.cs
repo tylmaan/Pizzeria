@@ -3,6 +3,9 @@ using System.Net.Http.Json;
 using Microsoft.AspNetCore.Authentication.BearerToken;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.AspNetCore.TestHost;
+using Microsoft.Extensions.DependencyInjection;
+using Pizzeria.Application.Delivery;
 using Testcontainers.PostgreSql;
 
 namespace Pizzeria.Api.IntegrationTests.Infrastructure;
@@ -17,6 +20,9 @@ public sealed class PizzeriaApiFactory : WebApplicationFactory<Program>, IAsyncL
 
     private readonly PostgreSqlContainer _database = new PostgreSqlBuilder("postgis/postgis:17-3.5")
         .Build();
+
+    /// <summary>Replaces the fake geocoder so tests decide where an address lies.</summary>
+    public StubGeocoder Geocoder { get; } = new();
 
     public async Task InitializeAsync() => await _database.StartAsync();
 
@@ -46,6 +52,8 @@ public sealed class PizzeriaApiFactory : WebApplicationFactory<Program>, IAsyncL
         builder.UseSetting("Seed:DemoData", "false");
         // Every test signs in several users from the same (test server) address.
         builder.UseSetting("RateLimiting:LoginAttemptsPerMinute", "10000");
+        builder.UseSetting("RateLimiting:DeliveryChecksPerMinute", "10000");
+        builder.ConfigureTestServices(services => services.AddSingleton<IGeocodingService>(Geocoder));
     }
 }
 

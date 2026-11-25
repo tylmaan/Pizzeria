@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Pizzeria.Application.Abstractions;
 using Pizzeria.Application.Tenancy;
 using Pizzeria.Domain.Common;
+using Pizzeria.Domain.Delivery;
 using Pizzeria.Domain.Menu;
 using Pizzeria.Domain.Tenancy;
 using Pizzeria.Infrastructure.Identity;
@@ -28,6 +29,8 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options, ITenant
     public DbSet<Product> Products => Set<Product>();
 
     public DbSet<ModifierGroup> ModifierGroups => Set<ModifierGroup>();
+
+    public DbSet<DeliveryZone> DeliveryZones => Set<DeliveryZone>();
 
     public DbSet<UserLocation> UserLocations => Set<UserLocation>();
 
@@ -55,6 +58,8 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options, ITenant
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
+
+        builder.HasPostgresExtension("postgis");
 
         builder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
 

@@ -21,6 +21,10 @@ public static class ErrorCodes
     public const string ModifierGroupNotFound = "menu.modifier_group_not_found";
     public const string SizeInUse = "menu.size_in_use";
 
+    public const string DeliveryZoneNotFound = "delivery.zone_not_found";
+    public const string AddressNotFound = "delivery.address_not_found";
+    public const string ShopNotFound = "delivery.shop_not_found";
+
     public const string UserEmailTaken = "user.email_taken";
     public const string RoleNotAssignable = "user.role_not_assignable";
     public const string LocationsRequired = "user.locations_required";

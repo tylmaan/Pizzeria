@@ -12,3 +12,6 @@ public sealed class NotFoundException(string code = ErrorCodes.NotFound) : AppEx
 public sealed class ForbiddenException(string code = ErrorCodes.Forbidden) : AppException(code);
 
 public sealed class ConflictException(string code) : AppException(code);
+
+/// <summary>The request is valid but cannot be processed, e.g. an address that cannot be located.</summary>
+public sealed class UnprocessableException(string code) : AppException(code);

@@ -17,6 +17,7 @@ public sealed class AppExceptionHandler(IProblemDetailsService problemDetails) :
             NotFoundException e => (StatusCodes.Status404NotFound, e.Code, null),
             ForbiddenException e => (StatusCodes.Status403Forbidden, e.Code, null),
             ConflictException e => (StatusCodes.Status409Conflict, e.Code, null),
+            UnprocessableException e => (StatusCodes.Status422UnprocessableEntity, e.Code, null),
             DomainException e => (StatusCodes.Status422UnprocessableEntity, e.Code, null),
             _ => (0, null, null),
         };
