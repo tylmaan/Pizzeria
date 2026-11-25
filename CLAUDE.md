@@ -222,6 +222,16 @@ Zasada: SignalR tylko **powiadamia** o zmianie, źródłem prawdy jest REST API.
 - **Kierowca:** projekt mobile-first, obsługa jedną ręką, kluczowe przyciski na dole ekranu
 - **Sklep:** szybkie ładowanie na słabym telefonie i LTE, zamówienie w jak najmniejszej liczbie kroków
 
+### Frontend — jak to działa
+- **Typy API:** `packages/api-client/src/schema.ts` jest generowany z OpenAPI (`pnpm generate:api`, wymaga API na :5080) i commitowany. Aliasy typów (`LocationDto` itd.) eksportuje `@pizzeria/api-client`. Generator idzie przez `pnpm dlx` z TypeScript 5, bo `openapi-typescript` nie działa z natywnym TS 7 używanym w workspace.
+- **Kontrakt JSON:** API ma `RespectNullableAnnotations` + `RespectRequiredConstructorParameters`, więc pola w typach TS są wymagane i nie-null zgodnie z C#.
+- **Sesja:** `AuthSession` (api-client) trzyma refresh token w localStorage (przetrwa przeładowanie PWA), a access token tylko w pamięci. Token odświeża się 30 s przed wygaśnięciem, równoległe wywołania korzystają z jednego odświeżenia, a odrzucony refresh oznacza wylogowanie. Błąd sieci nie wylogowuje.
+- **Wywołania API:** `createApiClient` (openapi-fetch + middleware z tokenem; 401 → wylogowanie). Z TanStack Query używamy `unwrap(api.GET(...))`, który rzuca `ApiError` (`code`, `fieldErrors`). Po wylogowaniu cache zapytań jest czyszczony.
+- **Tłumaczenie kodów z API:** `useCodeTranslations()` z `@pizzeria/i18n` (`error(code)` → `errors.<code>`, `validation(code)`, `role(role)`). W formularzach `useFormErrors(mutation.error)` daje baner i błędy per pole (klucze jak w API, np. `address.postalCode`).
+- **web-staff:** `createAppServices()` + `AppServicesProvider` (sesja, klient API, QueryClient; w testach wstrzykiwany fałszywy `fetch`). Trasy są w `src/routes/index.tsx`, sekcje i role w `src/routes/navigation.ts` (pierwsza dozwolona sekcja to strona startowa). `RequireAuth` (logowanie + `/me`) i `RequireRole` tylko ukrywają UI — API sprawdza to samo niezależnie.
+- **Tailwind** skanuje tylko aplikację, dlatego `index.css` ma `@source` na `packages/ui/src`.
+- **Testy UI:** `src/test/renderApp.tsx` renderuje całą aplikację z routerem w pamięci i fałszywym backendem (`"METHOD /path"` → odpowiedź; brak stubu = 404). Bez MSW i bez user-event: wystarcza `fireEvent`.
+
 ### Testy
 - Obowiązkowo testy jednostkowe dla: maszyny stanów zamówienia, liczenia cen (w tym pół na pół i modyfikatory), przypisania adresu do strefy, rozliczenia zmiany kierowcy
 - Testy integracyjne API na prawdziwym PostgreSQL (Testcontainers), w tym test izolacji tenantów: użytkownik firmy A nie widzi danych firmy B
@@ -267,7 +277,7 @@ pnpm --filter web-shop dev
 pnpm typecheck
 pnpm test
 pnpm build
-pnpm generate:api   # typy z OpenAPI — jeszcze nie skonfigurowane
+pnpm generate:api   # typy z OpenAPI → packages/api-client/src/schema.ts (API musi działać na :5080)
 ```
 
 Konwencje szkieletu:
@@ -282,7 +292,7 @@ Konwencje szkieletu:
 ### Etap 1 — pełna ścieżka zamówienia (MVP)
 Cel: jedno zamówienie przechodzi całą drogę od klienta do dostarczenia.
 1. ✅ Szkielet repo, docker-compose, CI (build + testy)
-2. ✅ Firmy, lokale, użytkownicy, role, auth, middleware tenanta (API; UI logowania i panelu firmy razem z kolejnymi krokami)
+2. ✅ Firmy, lokale, użytkownicy, role, auth, middleware tenanta — API oraz UI: logowanie, panel firmy (lokale, pracownicy)
 3. Menu firmy: kategorie, produkty, rozmiary, modyfikatory, pół na pół (prosty edytor w panelu firmy)
 4. Strefy dostaw lokalu + geokodowanie (fake/prosty dostawca)
 5. Sklep klienta: menu → koszyk → adres → zamówienie jako gość, płatność przy odbiorze, strona śledzenia

@@ -1,7 +1,7 @@
 import { useTranslation } from '@pizzeria/i18n';
 
 type Props = {
-  titleKey: 'nav.orders' | 'nav.kitchen' | 'nav.driver' | 'nav.company';
+  titleKey: 'nav.orders' | 'nav.kitchen' | 'nav.driver';
 };
 
 export function Placeholder({ titleKey }: Props) {

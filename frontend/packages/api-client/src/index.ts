@@ -1,38 +1,20 @@
-// API types will be generated from the backend OpenAPI document (`pnpm generate:api`).
-// Until then this package only holds the transport layer shared by both apps.
+import type { components } from './schema';
 
-/** RFC 7807 problem details; `code` is the machine-readable error code translated via i18n. */
-export interface ProblemDetails {
-  type?: string;
-  title?: string;
-  status?: number;
-  detail?: string;
-  code?: string;
-  errors?: Record<string, string[]>;
-}
+// Request/response types are generated from the backend OpenAPI document: `pnpm generate:api`
+// (needs the API running on :5080). Never write DTOs by hand — alias the generated ones here.
+export type { components, paths } from './schema';
 
-export class ApiError extends Error {
-  readonly status: number;
-  readonly problem: ProblemDetails | undefined;
+type Schemas = components['schemas'];
+export type AddressDto = Schemas['AddressDto'];
+export type AssignableRoleDto = Schemas['AssignableRoleDto'];
+export type CreateLocationRequest = Schemas['CreateLocationRequest'];
+export type CreateUserRequest = Schemas['CreateUserRequest'];
+export type LocationDto = Schemas['LocationDto'];
+export type MeResponse = Schemas['MeResponse'];
+export type UpdateLocationRequest = Schemas['UpdateLocationRequest'];
+export type UserDto = Schemas['UserDto'];
 
-  constructor(status: number, problem: ProblemDetails | undefined) {
-    super(problem?.code ?? `http_${status}`);
-    this.name = 'ApiError';
-    this.status = status;
-    this.problem = problem;
-  }
-}
-
-export async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> {
-  const response = await fetch(`/api${path}`, {
-    ...init,
-    headers: { Accept: 'application/json', ...init?.headers },
-  });
-
-  if (!response.ok) {
-    const isProblem = response.headers.get('Content-Type')?.includes('json') ?? false;
-    throw new ApiError(response.status, isProblem ? ((await response.json()) as ProblemDetails) : undefined);
-  }
-
-  return response.status === 204 ? (undefined as T) : ((await response.json()) as T);
-}
+export { AuthSession, localStorageTokenStore, type AuthSessionOptions, type RefreshTokenStore } from './auth';
+export { createApiClient, unwrap, type ApiClient, type ApiClientOptions } from './client';
+export { ApiError, errorCodeOf, NETWORK_ERROR_CODE, UNEXPECTED_ERROR_CODE, type ProblemDetails } from './errors';
+export { Roles, type Role } from './roles';

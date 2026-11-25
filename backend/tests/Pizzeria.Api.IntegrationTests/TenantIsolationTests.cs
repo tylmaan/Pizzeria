@@ -108,6 +108,21 @@ public sealed class TenantIsolationTests(PizzeriaApiFactory factory)
     }
 
     [Fact]
+    public async Task LocationManager_AssignableRoles_AreOperationalStaffNeedingLocations()
+    {
+        var (a, _) = await CreateTwoCompaniesAsync();
+        var location = await a.Admin.CreateLocationAsync("A Centrum");
+        var managerEmail = await a.Admin.CreateUserAsync(Roles.LocationManager, location.Id);
+        using var manager = await factory.LoginAsync(managerEmail);
+
+        var roles = await manager.GetFromJsonAsync<List<AssignableRoleDto>>("/api/users/assignable-roles");
+
+        Assert.Equal(
+            [new(Roles.Staff, true), new(Roles.Kitchen, true), new(Roles.Driver, true)],
+            roles!);
+    }
+
+    [Fact]
     public async Task CompanyAdmin_CannotUsePlatformEndpoints()
     {
         var (a, _) = await CreateTwoCompaniesAsync();

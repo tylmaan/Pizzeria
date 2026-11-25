@@ -7,13 +7,114 @@
     "orders": "Zamówienia",
     "kitchen": "Kuchnia",
     "driver": "Kierowca",
-    "company": "Panel firmy"
+    "locations": "Lokale",
+    "staff": "Pracownicy",
+    "mainMenu": "Menu główne"
   },
   "placeholder": {
-    "comingSoon": "Ta sekcja jest w budowie."
+    "comingSoon": "Ta sekcja jest w budowie.",
+    "noPanel": "Dla Twojej roli nie ma jeszcze panelu."
+  },
+  "auth": {
+    "title": "Zaloguj się",
+    "email": "E-mail",
+    "password": "Hasło",
+    "submit": "Zaloguj",
+    "submitting": "Logowanie…",
+    "logout": "Wyloguj"
+  },
+  "common": {
+    "save": "Zapisz",
+    "saving": "Zapisywanie…",
+    "cancel": "Anuluj",
+    "loading": "Ładowanie…",
+    "retry": "Spróbuj ponownie",
+    "active": "Aktywny",
+    "inactive": "Nieaktywny"
+  },
+  "locations": {
+    "title": "Lokale",
+    "add": "Dodaj lokal",
+    "newTitle": "Nowy lokal",
+    "editTitle": "Edycja lokalu",
+    "name": "Nazwa lokalu",
+    "street": "Ulica i numer",
+    "postalCode": "Kod pocztowy",
+    "postalCodeHint": "Format: 00-000",
+    "city": "Miasto",
+    "isActive": "Lokal aktywny",
+    "empty": "Nie ma jeszcze żadnego lokalu. Dodaj pierwszy."
+  },
+  "staff": {
+    "title": "Pracownicy",
+    "add": "Dodaj pracownika",
+    "newTitle": "Nowy pracownik",
+    "displayName": "Imię i nazwisko",
+    "email": "E-mail (login)",
+    "password": "Hasło startowe",
+    "passwordHint": "Min. 8 znaków, w tym cyfra. Przekaż je pracownikowi.",
+    "role": "Rola",
+    "locations": "Lokale",
+    "locationsHint": "Zaznacz lokale, w których pracuje.",
+    "allLocations": "Wszystkie lokale",
+    "empty": "Brak pracowników."
+  },
+  "roles": {
+    "PlatformAdmin": "Administrator platformy",
+    "CompanyAdmin": "Administrator firmy",
+    "LocationManager": "Kierownik lokalu",
+    "Staff": "Obsługa",
+    "Kitchen": "Kuchnia",
+    "Driver": "Kierowca",
+    "Customer": "Klient"
   },
   "errors": {
-    "unknown": "Coś poszło nie tak. Spróbuj ponownie.",
-    "network": "Brak połączenia z serwerem."
+    "common": {
+      "validation_failed": "Sprawdź zaznaczone pola.",
+      "not_found": "Nie znaleziono.",
+      "forbidden": "Nie masz uprawnień do tej operacji.",
+      "unexpected": "Coś poszło nie tak. Spróbuj ponownie.",
+      "too_many_requests": "Za dużo prób. Odczekaj chwilę i spróbuj ponownie.",
+      "network": "Brak połączenia z serwerem. Sprawdź internet."
+    },
+    "auth": {
+      "invalid_credentials": "Nieprawidłowy e-mail lub hasło.",
+      "locked_out": "Konto zablokowane na kilka minut po zbyt wielu próbach.",
+      "unauthorized": "Sesja wygasła. Zaloguj się ponownie."
+    },
+    "company": {
+      "slug_taken": "Ten adres sklepu jest już zajęty.",
+      "invalid_slug": "Nieprawidłowy adres sklepu."
+    },
+    "location": {
+      "not_found": "Nie znaleziono lokalu.",
+      "invalid_time_zone": "Nieznana strefa czasowa."
+    },
+    "tenancy": {
+      "invalid_name": "Nieprawidłowa nazwa."
+    },
+    "user": {
+      "email_taken": "Ten e-mail jest już używany.",
+      "role_not_assignable": "Nie możesz nadać tej roli.",
+      "locations_required": "Wybierz przynajmniej jeden lokal.",
+      "locations_not_allowed": "Ta rola nie jest przypisywana do lokali."
+    }
+  },
+  "validation": {
+    "invalid": "Nieprawidłowa wartość.",
+    "not_empty": "To pole jest wymagane.",
+    "not_null": "To pole jest wymagane.",
+    "maximum_length": "Za długi tekst.",
+    "length": "Nieprawidłowa długość.",
+    "email": "Nieprawidłowy adres e-mail.",
+    "invalid_email": "Nieprawidłowy adres e-mail.",
+    "postal_code": "Kod pocztowy w formacie 00-000.",
+    "time_zone": "Nieznana strefa czasowa.",
+    "slug": "Tylko małe litery, cyfry i myślniki.",
+    "role": "Wybierz rolę.",
+    "regular_expression": "Nieprawidłowy format.",
+    "password_too_short": "Hasło musi mieć co najmniej 8 znaków.",
+    "password_requires_digit": "Hasło musi zawierać cyfrę.",
+    "invalid_user_name": "Nieprawidłowy login."
   }
 }

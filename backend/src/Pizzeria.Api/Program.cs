@@ -18,6 +18,13 @@ builder.Services.AddSerilog((services, logger) => logger
     .Enrich.FromLogContext()
     .WriteTo.Console(formatProvider: CultureInfo.InvariantCulture));
 
+// Strict contracts: missing constructor parameters and nulls in non-nullable properties are rejected.
+// The OpenAPI document reflects the same rules, so generated TypeScript types have required, non-null fields.
+builder.Services.ConfigureHttpJsonOptions(options =>
+{
+    options.SerializerOptions.RespectNullableAnnotations = true;
+    options.SerializerOptions.RespectRequiredConstructorParameters = true;
+});
 builder.Services.AddOpenApi();
 builder.Services.AddProblemDetails(options => options.CustomizeProblemDetails = ProblemDetailsCodes.AddDefaultCode);
 builder.Services.AddExceptionHandler<AppExceptionHandler>();

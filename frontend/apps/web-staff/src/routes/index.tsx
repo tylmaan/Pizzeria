@@ -1,16 +1,70 @@
-import type { RouteObject } from 'react-router';
-import { Layout } from './Layout';
+import { Roles } from '@pizzeria/api-client';
+import { Navigate, type RouteObject } from 'react-router';
+import { LoginPage } from '../auth/LoginPage';
+import { RequireAuth, RequireRole } from '../auth/RequireAuth';
+import { EditLocationPage, NewLocationPage } from '../company/LocationFormPage';
+import { LocationsPage } from '../company/LocationsPage';
+import { NewStaffPage } from '../company/NewStaffPage';
+import { StaffPage } from '../company/StaffPage';
+import { navItems } from './navigation';
+import { Layout, StartPage } from './Layout';
 import { Placeholder } from './Placeholder';
+
+const rolesFor = (to: string) => navItems.find((item) => item.to === to)?.roles ?? [];
 
 // One PWA, separate route sections per role: location panel, kitchen, driver, company panel.
 export const routes: RouteObject[] = [
+  { path: '/login', element: <LoginPage /> },
   {
-    element: <Layout />,
+    element: (
+      <RequireAuth>
+        <Layout />
+      </RequireAuth>
+    ),
     children: [
-      { index: true, element: <Placeholder titleKey="nav.orders" /> },
-      { path: 'kitchen', element: <Placeholder titleKey="nav.kitchen" /> },
-      { path: 'driver', element: <Placeholder titleKey="nav.driver" /> },
-      { path: 'company', element: <Placeholder titleKey="nav.company" /> },
+      { index: true, element: <StartPage /> },
+      {
+        path: 'orders',
+        element: (
+          <RequireRole roles={rolesFor('/orders')}>
+            <Placeholder titleKey="nav.orders" />
+          </RequireRole>
+        ),
+      },
+      {
+        path: 'kitchen',
+        element: (
+          <RequireRole roles={rolesFor('/kitchen')}>
+            <Placeholder titleKey="nav.kitchen" />
+          </RequireRole>
+        ),
+      },
+      {
+        path: 'driver',
+        element: (
+          <RequireRole roles={rolesFor('/driver')}>
+            <Placeholder titleKey="nav.driver" />
+          </RequireRole>
+        ),
+      },
+      {
+        path: 'company/locations',
+        element: <RequireRole roles={[Roles.CompanyAdmin]} />,
+        children: [
+          { index: true, element: <LocationsPage /> },
+          { path: 'new', element: <NewLocationPage /> },
+          { path: ':id', element: <EditLocationPage /> },
+        ],
+      },
+      {
+        path: 'company/staff',
+        element: <RequireRole roles={[Roles.CompanyAdmin, Roles.LocationManager]} />,
+        children: [
+          { index: true, element: <StaffPage /> },
+          { path: 'new', element: <NewStaffPage /> },
+        ],
+      },
+      { path: '*', element: <Navigate to="/" replace /> },
     ],
   },
 ];

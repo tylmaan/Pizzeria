@@ -35,6 +35,15 @@ public sealed class RoleAssignmentPolicyTests
     }
 
     [Fact]
+    public void AssignableRoles_LocationManager_ListsOperationalStaffOnly()
+    {
+        var manager = new TenantContext();
+        manager.SetUser(Guid.NewGuid(), Guid.NewGuid(), [Roles.LocationManager], [Guid.NewGuid()]);
+
+        Assert.Equal([Roles.Staff, Roles.Kitchen, Roles.Driver], RoleAssignmentPolicy.AssignableRoles(manager));
+    }
+
+    [Fact]
     public void CanAssign_WithoutCompany_IsAlwaysFalse()
     {
         var platformAdmin = new TenantContext();

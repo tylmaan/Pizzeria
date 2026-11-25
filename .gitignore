@@ -31,3 +31,6 @@ print-output/
 !.vscode/extensions.json
 Thumbs.db
 .DS_Store
+
+# Local Claude Code tooling (preview launch configs)
+.claude/

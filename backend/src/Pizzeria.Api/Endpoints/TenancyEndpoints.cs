@@ -57,6 +57,8 @@ public static class TenancyEndpoints
 
         group.MapGet("/", (UserService service, CancellationToken ct) => service.ListAsync(ct));
 
+        group.MapGet("/assignable-roles", (UserService service) => service.GetAssignableRoles());
+
         group.MapPost("/", async (CreateUserRequest request, UserService service, CancellationToken ct) =>
         {
             var user = await service.CreateAsync(request, ct).ConfigureAwait(false);

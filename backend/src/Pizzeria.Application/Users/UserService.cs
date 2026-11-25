@@ -20,6 +20,17 @@ public sealed class UserService(
         return accounts.ListAsync(companyId, tenant.IsCompanyAdmin ? null : tenant.LocationIds.ToList(), ct);
     }
 
+    /// <summary>Roles the current user may grant — the frontend uses it to build the role picker.</summary>
+    public IReadOnlyList<AssignableRoleDto> GetAssignableRoles()
+    {
+        RequireStaffManager();
+        return
+        [
+            .. RoleAssignmentPolicy.AssignableRoles(tenant)
+                .Select(role => new AssignableRoleDto(role, Roles.LocationScoped.Contains(role))),
+        ];
+    }
+
     public async Task<UserDto> CreateAsync(CreateUserRequest request, CancellationToken ct)
     {
         var companyId = RequireStaffManager();

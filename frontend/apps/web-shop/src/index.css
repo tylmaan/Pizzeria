@@ -1,1 +1,4 @@
 @import 'tailwindcss';
+
+/* Tailwind scans the app by default; shared components live in a workspace package. */
+@source '../../../packages/ui/src';

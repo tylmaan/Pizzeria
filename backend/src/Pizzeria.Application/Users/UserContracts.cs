@@ -2,6 +2,9 @@ namespace Pizzeria.Application.Users;
 
 public sealed record UserDto(Guid Id, string Email, string DisplayName, string Role, IReadOnlyList<Guid> LocationIds);
 
+/// <summary>A role the current user may grant; location-scoped roles need at least one location.</summary>
+public sealed record AssignableRoleDto(string Role, bool RequiresLocations);
+
 public sealed record CreateUserRequest(
     string Email,
     string Password,
