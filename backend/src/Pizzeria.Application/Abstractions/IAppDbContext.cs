@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Pizzeria.Domain.Delivery;
 using Pizzeria.Domain.Menu;
+using Pizzeria.Domain.Orders;
 using Pizzeria.Domain.Tenancy;
 using Location = Pizzeria.Domain.Tenancy.Location;
 
@@ -24,6 +25,8 @@ public interface IAppDbContext
     DbSet<ModifierGroup> ModifierGroups { get; }
 
     DbSet<DeliveryZone> DeliveryZones { get; }
+
+    DbSet<Order> Orders { get; }
 
     DatabaseFacade Database { get; }
 

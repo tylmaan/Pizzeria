@@ -81,11 +81,33 @@ public sealed class DeliveryZoneService(
     }
 }
 
+/// <summary>Where an address lies and which zone (and location) delivers there, if any.</summary>
+public sealed record ResolvedDelivery(GeocodedAddress Address, DeliveryZone? Zone, Location? Location);
+
+/// <summary>Address → geocoded point → the delivering zone. Shared by the delivery check and order placement.</summary>
+public sealed class DeliveryResolver(IAppDbContext db, IGeocodingService geocoding)
+{
+    /// <exception cref="UnprocessableException">The address cannot be geocoded.</exception>
+    public async Task<ResolvedDelivery> ResolveAsync(AddressQuery query, CancellationToken ct)
+    {
+        var address = await geocoding.GeocodeAsync(query, ct).ConfigureAwait(false)
+            ?? throw new UnprocessableException(ErrorCodes.AddressNotFound);
+
+        var point = address.Point.ToPoint();
+        var candidates = await db.DeliveryZones
+            .Where(z => z.IsActive && z.Area.Covers(point))
+            .Join(db.Locations.Where(l => l.IsActive), z => z.LocationId, l => l.Id, (z, l) => new { Zone = z, Location = l })
+            .ToListAsync(ct).ConfigureAwait(false);
+
+        var zone = DeliveryZone.PickFor(candidates.Select(c => c.Zone), address.Point);
+        return new ResolvedDelivery(address, zone, zone is null ? null : candidates.First(c => c.Zone == zone).Location);
+    }
+}
+
 /// <summary>Answers "do you deliver to this address, from which location and on what terms".</summary>
 public sealed class DeliveryCheckService(
-    IAppDbContext db,
     ITenantContext tenant,
-    IGeocodingService geocoding,
+    DeliveryResolver resolver,
     IValidator<DeliveryCheckRequest> validator)
 {
     public async Task<DeliveryQuoteDto> CheckAsync(DeliveryCheckRequest request, CancellationToken ct)
@@ -98,17 +120,9 @@ public sealed class DeliveryCheckService(
 
         await validator.ValidateAndThrowAsync(request, ct).ConfigureAwait(false);
 
-        var address = await geocoding.GeocodeAsync(new AddressQuery(request.Street, request.PostalCode, request.City), ct)
-            .ConfigureAwait(false)
-            ?? throw new UnprocessableException(ErrorCodes.AddressNotFound);
-
-        var point = address.Point.ToPoint();
-        var candidates = await db.DeliveryZones
-            .Where(z => z.IsActive && z.Area.Covers(point))
-            .Join(db.Locations.Where(l => l.IsActive), z => z.LocationId, l => l.Id, (z, l) => new { Zone = z, LocationName = l.Name })
-            .ToListAsync(ct).ConfigureAwait(false);
-
-        var zone = DeliveryZone.PickFor(candidates.Select(c => c.Zone), address.Point);
+        var (address, zone, location) = await resolver
+            .ResolveAsync(new AddressQuery(request.Street, request.PostalCode, request.City), ct)
+            .ConfigureAwait(false);
         var pointDto = GeoPointDto.From(address.Point);
         if (zone is null)
         {
@@ -120,7 +134,7 @@ public sealed class DeliveryCheckService(
             pointDto,
             address.FormattedAddress,
             zone.LocationId,
-            candidates.First(c => c.Zone == zone).LocationName,
+            location!.Name,
             zone.Id,
             zone.Name,
             zone.DeliveryFee,

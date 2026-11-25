@@ -24,6 +24,9 @@ public static class ErrorCodes
     public const string DeliveryZoneNotFound = "delivery.zone_not_found";
     public const string AddressNotFound = "delivery.address_not_found";
     public const string ShopNotFound = "delivery.shop_not_found";
+    public const string AddressNotDelivered = "delivery.address_not_delivered";
+
+    public const string OrderNotFound = "order.not_found";
 
     public const string UserEmailTaken = "user.email_taken";
     public const string RoleNotAssignable = "user.role_not_assignable";

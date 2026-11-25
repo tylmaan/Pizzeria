@@ -4,10 +4,12 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Pizzeria.Application.Abstractions;
 using Pizzeria.Application.Delivery;
+using Pizzeria.Application.Orders;
 using Pizzeria.Application.Tenancy;
 using Pizzeria.Application.Users;
 using Pizzeria.Infrastructure.Geocoding;
 using Pizzeria.Infrastructure.Identity;
+using Pizzeria.Infrastructure.Orders;
 using Pizzeria.Infrastructure.Persistence;
 using Pizzeria.Infrastructure.Tenancy;
 
@@ -38,6 +40,7 @@ public static class DependencyInjection
         services.AddMemoryCache();
         services.AddScoped<ICompanyResolver, CompanyResolver>();
         services.AddScoped<IUserAccountService, UserAccountService>();
+        services.AddScoped<IOrderNumberGenerator, OrderNumberGenerator>();
 
         services.Configure<GeocodingOptions>(configuration.GetSection(GeocodingOptions.SectionName));
         // The real geocoding provider is an open decision (CLAUDE.md); the fake is the only implementation so far.

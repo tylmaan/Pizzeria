@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Pizzeria.Application.Delivery;
 using Pizzeria.Application.Locations;
 using Pizzeria.Application.Menu;
+using Pizzeria.Application.Orders;
 using Pizzeria.Application.Platform;
 using Pizzeria.Application.Tenancy;
 using Pizzeria.Application.Users;
@@ -22,9 +23,14 @@ public static class DependencyInjection
 
         services.AddScoped<CompanyService>();
         services.AddScoped<DeliveryZoneService>();
+        services.AddScoped<DeliveryResolver>();
         services.AddScoped<DeliveryCheckService>();
         services.AddScoped<LocationService>();
         services.AddScoped<MenuService>();
+        services.AddScoped<ShopService>();
+        services.AddScoped<PlaceOrderService>();
+        services.AddScoped<OrderTrackingService>();
+        services.AddSingleton<IOrderNotifier, NullOrderNotifier>();
         services.AddScoped<UserService>();
 
         return services;

@@ -53,6 +53,7 @@ public sealed class PizzeriaApiFactory : WebApplicationFactory<Program>, IAsyncL
         // Every test signs in several users from the same (test server) address.
         builder.UseSetting("RateLimiting:LoginAttemptsPerMinute", "10000");
         builder.UseSetting("RateLimiting:DeliveryChecksPerMinute", "10000");
+        builder.UseSetting("RateLimiting:OrdersPerMinute", "10000");
         builder.ConfigureTestServices(services => services.AddSingleton<IGeocodingService>(Geocoder));
     }
 }

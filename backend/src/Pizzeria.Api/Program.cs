@@ -49,6 +49,7 @@ AuthorizationPolicies.Configure(builder.Services.AddAuthorizationBuilder());
 // Brute-force protection on top of Identity lockout: login attempts per client IP per minute.
 var loginAttemptsPerMinute = builder.Configuration.GetValue("RateLimiting:LoginAttemptsPerMinute", 10);
 var deliveryChecksPerMinute = builder.Configuration.GetValue("RateLimiting:DeliveryChecksPerMinute", 30);
+var ordersPerMinute = builder.Configuration.GetValue("RateLimiting:OrdersPerMinute", 10);
 builder.Services.AddRateLimiter(options =>
 {
     options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
@@ -58,6 +59,9 @@ builder.Services.AddRateLimiter(options =>
     options.AddPolicy(DeliveryEndpoints.DeliveryCheckRateLimitPolicy, context => RateLimitPartition.GetFixedWindowLimiter(
         context.Connection.RemoteIpAddress?.ToString() ?? "unknown",
         _ => new FixedWindowRateLimiterOptions { PermitLimit = deliveryChecksPerMinute, Window = TimeSpan.FromMinutes(1) }));
+    options.AddPolicy(ShopEndpoints.PlaceOrderRateLimitPolicy, context => RateLimitPartition.GetFixedWindowLimiter(
+        context.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+        _ => new FixedWindowRateLimiterOptions { PermitLimit = ordersPerMinute, Window = TimeSpan.FromMinutes(1) }));
 });
 
 var app = builder.Build();
@@ -86,6 +90,7 @@ api.MapLocationEndpoints();
 api.MapUserEndpoints();
 api.MapMenuEndpoints();
 api.MapDeliveryEndpoints();
+api.MapShopEndpoints();
 
 await DatabaseInitializer.InitializeAsync(app.Services).ConfigureAwait(false);
 

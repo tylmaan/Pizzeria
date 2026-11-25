@@ -344,6 +344,137 @@ namespace Pizzeria.Infrastructure.Persistence.Migrations
                     b.ToTable("products", (string)null);
                 });
 
+            modelBuilder.Entity("Pizzeria.Domain.Orders.Order", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<string>("CancellationReason")
+                        .HasMaxLength(300)
+                        .HasColumnType("character varying(300)")
+                        .HasColumnName("cancellation_reason");
+
+                    b.Property<Guid>("CompanyId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("company_id");
+
+                    b.Property<string>("CustomerName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("customer_name");
+
+                    b.Property<string>("CustomerPhone")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("customer_phone");
+
+                    b.Property<decimal>("DeliveryFee")
+                        .HasPrecision(10, 2)
+                        .HasColumnType("numeric(10,2)")
+                        .HasColumnName("delivery_fee");
+
+                    b.Property<string>("DeliveryNotes")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)")
+                        .HasColumnName("delivery_notes");
+
+                    b.Property<Point>("DeliveryPoint")
+                        .HasColumnType("geometry(Point, 4326)")
+                        .HasColumnName("delivery_point");
+
+                    b.Property<Guid?>("DriverId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("driver_id");
+
+                    b.Property<string>("Fulfillment")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("fulfillment");
+
+                    b.Property<decimal>("ItemsTotal")
+                        .HasPrecision(10, 2)
+                        .HasColumnType("numeric(10,2)")
+                        .HasColumnName("items_total");
+
+                    b.Property<Guid>("LocationId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("location_id");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)")
+                        .HasColumnName("notes");
+
+                    b.Property<int>("Number")
+                        .HasColumnType("integer")
+                        .HasColumnName("number");
+
+                    b.Property<string>("PaymentMethod")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("character varying(30)")
+                        .HasColumnName("payment_method");
+
+                    b.Property<string>("PaymentStatus")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("character varying(30)")
+                        .HasColumnName("payment_status");
+
+                    b.Property<DateTimeOffset>("PlacedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("placed_at");
+
+                    b.Property<string>("Source")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("source");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("character varying(30)")
+                        .HasColumnName("status");
+
+                    b.Property<decimal>("Total")
+                        .HasPrecision(10, 2)
+                        .HasColumnType("numeric(10,2)")
+                        .HasColumnName("total");
+
+                    b.Property<string>("TrackingToken")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)")
+                        .HasColumnName("tracking_token");
+
+                    b.HasKey("Id")
+                        .HasName("pk_orders");
+
+                    b.HasIndex("CompanyId")
+                        .HasDatabaseName("ix_orders_company_id");
+
+                    b.HasIndex("DriverId")
+                        .HasDatabaseName("ix_orders_driver_id");
+
+                    b.HasIndex("TrackingToken")
+                        .IsUnique()
+                        .HasDatabaseName("ix_orders_tracking_token");
+
+                    b.HasIndex("LocationId", "PlacedAt")
+                        .HasDatabaseName("ix_orders_location_id_placed_at");
+
+                    b.HasIndex("LocationId", "Status")
+                        .HasDatabaseName("ix_orders_location_id_status");
+
+                    b.ToTable("orders", (string)null);
+                });
+
             modelBuilder.Entity("Pizzeria.Domain.Tenancy.Company", b =>
                 {
                     b.Property<Guid>("Id")
@@ -574,6 +705,26 @@ namespace Pizzeria.Infrastructure.Persistence.Migrations
                         .HasDatabaseName("ix_user_locations_location_id");
 
                     b.ToTable("user_locations", (string)null);
+                });
+
+            modelBuilder.Entity("Pizzeria.Infrastructure.Orders.OrderCounter", b =>
+                {
+                    b.Property<Guid>("LocationId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("location_id");
+
+                    b.Property<DateOnly>("BusinessDay")
+                        .HasColumnType("date")
+                        .HasColumnName("business_day");
+
+                    b.Property<int>("LastNumber")
+                        .HasColumnType("integer")
+                        .HasColumnName("last_number");
+
+                    b.HasKey("LocationId", "BusinessDay")
+                        .HasName("pk_order_counters");
+
+                    b.ToTable("order_counters", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
@@ -880,6 +1031,227 @@ namespace Pizzeria.Infrastructure.Persistence.Migrations
                     b.Navigation("ModifierGroups");
 
                     b.Navigation("Prices");
+                });
+
+            modelBuilder.Entity("Pizzeria.Domain.Orders.Order", b =>
+                {
+                    b.HasOne("Pizzeria.Domain.Tenancy.Company", null)
+                        .WithMany()
+                        .HasForeignKey("CompanyId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_orders_companies_company_id");
+
+                    b.HasOne("Pizzeria.Domain.Tenancy.Location", null)
+                        .WithMany()
+                        .HasForeignKey("LocationId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_orders_locations_location_id");
+
+                    b.OwnsOne("Pizzeria.Domain.Tenancy.Address", "DeliveryAddress", b1 =>
+                        {
+                            b1.Property<Guid>("OrderId")
+                                .HasColumnType("uuid");
+
+                            b1.Property<string>("City")
+                                .IsRequired()
+                                .HasMaxLength(100)
+                                .HasColumnType("character varying(100)")
+                                .HasColumnName("delivery_city");
+
+                            b1.Property<string>("PostalCode")
+                                .IsRequired()
+                                .HasMaxLength(10)
+                                .HasColumnType("character varying(10)")
+                                .HasColumnName("delivery_postal_code");
+
+                            b1.Property<string>("Street")
+                                .IsRequired()
+                                .HasMaxLength(200)
+                                .HasColumnType("character varying(200)")
+                                .HasColumnName("delivery_street");
+
+                            b1.HasKey("OrderId");
+
+                            b1.ToTable("orders");
+
+                            b1.WithOwner()
+                                .HasForeignKey("OrderId");
+                        });
+
+                    b.OwnsMany("Pizzeria.Domain.Orders.OrderItem", "Items", b1 =>
+                        {
+                            b1.Property<Guid>("Id")
+                                .HasColumnType("uuid")
+                                .HasColumnName("id");
+
+                            b1.Property<decimal>("BasePrice")
+                                .HasPrecision(10, 2)
+                                .HasColumnType("numeric(10,2)")
+                                .HasColumnName("base_price");
+
+                            b1.Property<decimal>("LineTotal")
+                                .HasPrecision(10, 2)
+                                .HasColumnType("numeric(10,2)")
+                                .HasColumnName("line_total");
+
+                            b1.Property<string>("Notes")
+                                .HasMaxLength(200)
+                                .HasColumnType("character varying(200)")
+                                .HasColumnName("notes");
+
+                            b1.Property<Guid>("OrderId")
+                                .HasColumnType("uuid")
+                                .HasColumnName("order_id");
+
+                            b1.Property<Guid>("ProductId")
+                                .HasColumnType("uuid")
+                                .HasColumnName("product_id");
+
+                            b1.Property<string>("ProductName")
+                                .IsRequired()
+                                .HasMaxLength(200)
+                                .HasColumnType("character varying(200)")
+                                .HasColumnName("product_name");
+
+                            b1.Property<int>("Quantity")
+                                .HasColumnType("integer")
+                                .HasColumnName("quantity");
+
+                            b1.Property<Guid?>("SecondHalfProductId")
+                                .HasColumnType("uuid")
+                                .HasColumnName("second_half_product_id");
+
+                            b1.Property<string>("SecondHalfProductName")
+                                .HasMaxLength(200)
+                                .HasColumnType("character varying(200)")
+                                .HasColumnName("second_half_product_name");
+
+                            b1.Property<Guid>("SizeId")
+                                .HasColumnType("uuid")
+                                .HasColumnName("size_id");
+
+                            b1.Property<string>("SizeName")
+                                .IsRequired()
+                                .HasMaxLength(50)
+                                .HasColumnType("character varying(50)")
+                                .HasColumnName("size_name");
+
+                            b1.Property<int>("SortOrder")
+                                .HasColumnType("integer")
+                                .HasColumnName("sort_order");
+
+                            b1.Property<decimal>("UnitPrice")
+                                .HasPrecision(10, 2)
+                                .HasColumnType("numeric(10,2)")
+                                .HasColumnName("unit_price");
+
+                            b1.HasKey("Id")
+                                .HasName("pk_order_items");
+
+                            b1.HasIndex("OrderId")
+                                .HasDatabaseName("ix_order_items_order_id");
+
+                            b1.ToTable("order_items", (string)null);
+
+                            b1.WithOwner()
+                                .HasForeignKey("OrderId")
+                                .HasConstraintName("fk_order_items_orders_order_id");
+
+                            b1.OwnsMany("Pizzeria.Domain.Orders.OrderItemModifier", "Modifiers", b2 =>
+                                {
+                                    b2.Property<Guid>("Id")
+                                        .HasColumnType("uuid")
+                                        .HasColumnName("id");
+
+                                    b2.Property<Guid>("ModifierId")
+                                        .HasColumnType("uuid")
+                                        .HasColumnName("modifier_id");
+
+                                    b2.Property<string>("Name")
+                                        .IsRequired()
+                                        .HasMaxLength(200)
+                                        .HasColumnType("character varying(200)")
+                                        .HasColumnName("name");
+
+                                    b2.Property<Guid>("OrderItemId")
+                                        .HasColumnType("uuid")
+                                        .HasColumnName("order_item_id");
+
+                                    b2.Property<decimal>("Price")
+                                        .HasPrecision(10, 2)
+                                        .HasColumnType("numeric(10,2)")
+                                        .HasColumnName("price");
+
+                                    b2.HasKey("Id")
+                                        .HasName("pk_order_item_modifiers");
+
+                                    b2.HasIndex("OrderItemId")
+                                        .HasDatabaseName("ix_order_item_modifiers_order_item_id");
+
+                                    b2.ToTable("order_item_modifiers", (string)null);
+
+                                    b2.WithOwner()
+                                        .HasForeignKey("OrderItemId")
+                                        .HasConstraintName("fk_order_item_modifiers_order_items_order_item_id");
+                                });
+
+                            b1.Navigation("Modifiers");
+                        });
+
+                    b.OwnsMany("Pizzeria.Domain.Orders.OrderStatusChange", "StatusHistory", b1 =>
+                        {
+                            b1.Property<Guid>("Id")
+                                .HasColumnType("uuid")
+                                .HasColumnName("id");
+
+                            b1.Property<DateTimeOffset>("ChangedAt")
+                                .HasColumnType("timestamp with time zone")
+                                .HasColumnName("changed_at");
+
+                            b1.Property<Guid?>("ChangedByUserId")
+                                .HasColumnType("uuid")
+                                .HasColumnName("changed_by_user_id");
+
+                            b1.Property<string>("FromStatus")
+                                .HasMaxLength(30)
+                                .HasColumnType("character varying(30)")
+                                .HasColumnName("from_status");
+
+                            b1.Property<Guid>("OrderId")
+                                .HasColumnType("uuid")
+                                .HasColumnName("order_id");
+
+                            b1.Property<string>("Reason")
+                                .HasMaxLength(300)
+                                .HasColumnType("character varying(300)")
+                                .HasColumnName("reason");
+
+                            b1.Property<string>("ToStatus")
+                                .IsRequired()
+                                .HasMaxLength(30)
+                                .HasColumnType("character varying(30)")
+                                .HasColumnName("to_status");
+
+                            b1.HasKey("Id")
+                                .HasName("pk_order_status_changes");
+
+                            b1.HasIndex("OrderId")
+                                .HasDatabaseName("ix_order_status_changes_order_id");
+
+                            b1.ToTable("order_status_changes", (string)null);
+
+                            b1.WithOwner()
+                                .HasForeignKey("OrderId")
+                                .HasConstraintName("fk_order_status_changes_orders_order_id");
+                        });
+
+                    b.Navigation("DeliveryAddress");
+
+                    b.Navigation("Items");
+
+                    b.Navigation("StatusHistory");
                 });
 
             modelBuilder.Entity("Pizzeria.Domain.Tenancy.Location", b =>
