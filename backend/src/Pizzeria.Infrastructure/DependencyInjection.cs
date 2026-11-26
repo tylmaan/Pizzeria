@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Pizzeria.Application.Abstractions;
+using Pizzeria.Application.Customers;
 using Pizzeria.Application.Delivery;
 using Pizzeria.Application.Orders;
 using Pizzeria.Application.Payments;
@@ -56,10 +57,14 @@ public static class DependencyInjection
         // The real geocoding provider is an open decision (CLAUDE.md); the fake is the only implementation so far.
         services.AddSingleton<IGeocodingService, FakeGeocodingService>();
 
+        services.AddScoped<ICustomerIdentityService, CustomerIdentityService>();
+
         return services
             .AddIdentityCore<AppUser>(options =>
             {
-                options.User.RequireUniqueEmail = true;
+                // Staff log in with their e-mail as the (globally unique) user name; customers have accounts per
+                // company with "{company}+{email}" user names, so one e-mail may belong to several users.
+                options.User.RequireUniqueEmail = false;
                 options.Password.RequiredLength = 8;
                 options.Password.RequireDigit = true;
                 options.Password.RequireLowercase = false;

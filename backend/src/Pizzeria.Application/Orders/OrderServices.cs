@@ -8,6 +8,7 @@ using Pizzeria.Application.Menu;
 using Pizzeria.Application.Payments;
 using Pizzeria.Application.Tenancy;
 using Pizzeria.Domain.Common;
+using Pizzeria.Domain.Identity;
 using Pizzeria.Domain.Menu;
 using Pizzeria.Domain.Orders;
 using Pizzeria.Domain.Tenancy;
@@ -89,7 +90,8 @@ public sealed class PlaceOrderService(
             location,
             number,
             source,
-            new OrderCustomer(request.Customer.Name, request.Customer.Phone),
+            // Shop orders of a signed-in customer go to their order history.
+            new OrderCustomer(request.Customer.Name, request.Customer.Phone, source == OrderSource.Online && tenant.IsInRole(Roles.Customer) ? tenant.UserId : null),
             delivery,
             lines,
             request.PaymentMethod,

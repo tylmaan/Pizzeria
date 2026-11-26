@@ -154,6 +154,47 @@ namespace Pizzeria.Infrastructure.Persistence.Migrations
                     b.ToTable("user_tokens", (string)null);
                 });
 
+            modelBuilder.Entity("Pizzeria.Domain.Customers.SavedAddress", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<Guid>("CompanyId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("company_id");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<Guid>("CustomerId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("customer_id");
+
+                    b.Property<string>("Label")
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)")
+                        .HasColumnName("label");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("notes");
+
+                    b.HasKey("Id")
+                        .HasName("pk_saved_addresses");
+
+                    b.HasIndex("CompanyId")
+                        .HasDatabaseName("ix_saved_addresses_company_id");
+
+                    b.HasIndex("CustomerId")
+                        .HasDatabaseName("ix_saved_addresses_customer_id");
+
+                    b.ToTable("saved_addresses", (string)null);
+                });
+
             modelBuilder.Entity("Pizzeria.Domain.Delivery.DeliveryZone", b =>
                 {
                     b.Property<Guid>("Id")
@@ -511,6 +552,10 @@ namespace Pizzeria.Infrastructure.Persistence.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("company_id");
 
+                    b.Property<Guid?>("CustomerId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("customer_id");
+
                     b.Property<string>("CustomerName")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -616,6 +661,9 @@ namespace Pizzeria.Infrastructure.Persistence.Migrations
                     b.HasIndex("TrackingToken")
                         .IsUnique()
                         .HasDatabaseName("ix_orders_tracking_token");
+
+                    b.HasIndex("CustomerId", "PlacedAt")
+                        .HasDatabaseName("ix_orders_customer_id_placed_at");
 
                     b.HasIndex("LocationId", "PlacedAt")
                         .HasDatabaseName("ix_orders_location_id_placed_at");
@@ -1152,6 +1200,57 @@ namespace Pizzeria.Infrastructure.Persistence.Migrations
                         .HasConstraintName("fk_user_tokens_users_user_id");
                 });
 
+            modelBuilder.Entity("Pizzeria.Domain.Customers.SavedAddress", b =>
+                {
+                    b.HasOne("Pizzeria.Domain.Tenancy.Company", null)
+                        .WithMany()
+                        .HasForeignKey("CompanyId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_saved_addresses_companies_company_id");
+
+                    b.HasOne("Pizzeria.Infrastructure.Identity.AppUser", null)
+                        .WithMany()
+                        .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_saved_addresses_users_customer_id");
+
+                    b.OwnsOne("Pizzeria.Domain.Tenancy.Address", "Address", b1 =>
+                        {
+                            b1.Property<Guid>("SavedAddressId")
+                                .HasColumnType("uuid");
+
+                            b1.Property<string>("City")
+                                .IsRequired()
+                                .HasMaxLength(100)
+                                .HasColumnType("character varying(100)")
+                                .HasColumnName("city");
+
+                            b1.Property<string>("PostalCode")
+                                .IsRequired()
+                                .HasMaxLength(10)
+                                .HasColumnType("character varying(10)")
+                                .HasColumnName("postal_code");
+
+                            b1.Property<string>("Street")
+                                .IsRequired()
+                                .HasMaxLength(200)
+                                .HasColumnType("character varying(200)")
+                                .HasColumnName("street");
+
+                            b1.HasKey("SavedAddressId");
+
+                            b1.ToTable("saved_addresses");
+
+                            b1.WithOwner()
+                                .HasForeignKey("SavedAddressId");
+                        });
+
+                    b.Navigation("Address")
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("Pizzeria.Domain.Delivery.DeliveryZone", b =>
                 {
                     b.HasOne("Pizzeria.Domain.Tenancy.Company", null)
@@ -1436,6 +1535,12 @@ namespace Pizzeria.Infrastructure.Persistence.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
                         .HasConstraintName("fk_orders_companies_company_id");
+
+                    b.HasOne("Pizzeria.Infrastructure.Identity.AppUser", null)
+                        .WithMany()
+                        .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.SetNull)
+                        .HasConstraintName("fk_orders_users_customer_id");
 
                     b.HasOne("Pizzeria.Domain.Tenancy.Location", null)
                         .WithMany()

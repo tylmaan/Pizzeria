@@ -15,6 +15,7 @@ public static class AuthorizationPolicies
     public const string CompanyStaff = nameof(CompanyStaff);
     public const string Driver = nameof(Driver);
     public const string Agent = nameof(Agent);
+    public const string Customer = nameof(Customer);
 
     public static void Configure(AuthorizationBuilder builder)
     {
@@ -26,6 +27,7 @@ public static class AuthorizationPolicies
         builder.AddPolicy(PlatformAdmin, p => p.RequireRole(Roles.PlatformAdmin));
         builder.AddPolicy(CompanyAdmin, p => p.RequireRole(Roles.CompanyAdmin));
         builder.AddPolicy(Driver, p => p.RequireRole(Roles.Driver));
+        builder.AddPolicy(Customer, p => p.RequireRole(Roles.Customer));
 
         // The only policy that accepts agent device tokens (agent hub).
         builder.AddPolicy(Agent, p => p.AddAuthenticationSchemes(AgentTokenAuthenticationHandler.SchemeName).RequireRole(Roles.Agent));

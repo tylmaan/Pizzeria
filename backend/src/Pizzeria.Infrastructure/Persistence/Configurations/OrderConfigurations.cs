@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Pizzeria.Domain.Delivery;
 using Pizzeria.Domain.Orders;
 using Pizzeria.Domain.Tenancy;
+using Pizzeria.Infrastructure.Identity;
 using Pizzeria.Infrastructure.Orders;
 using Location = Pizzeria.Domain.Tenancy.Location;
 
@@ -45,6 +46,10 @@ internal sealed class OrderConfiguration : IEntityTypeConfiguration<Order>
         builder.HasIndex(o => new { o.LocationId, o.Status });
         builder.HasIndex(o => new { o.LocationId, o.PlacedAt });
         builder.HasIndex(o => o.DriverId);
+
+        // Deleting a customer account keeps the order (accounting) and drops the link.
+        builder.HasOne<AppUser>().WithMany().HasForeignKey(o => o.CustomerId).OnDelete(DeleteBehavior.SetNull);
+        builder.HasIndex(o => new { o.CustomerId, o.PlacedAt });
 
         builder.OwnsMany(o => o.Items, item =>
         {

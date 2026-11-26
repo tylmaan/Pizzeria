@@ -1,6 +1,3 @@
-using System.Text;
-using FluentValidation;
-using FluentValidation.Results;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Pizzeria.Application.Errors;
@@ -31,10 +28,10 @@ public sealed class UserAccountService(UserManager<AppUser> userManager, AppDbCo
         user.Locations.AddRange(account.LocationIds.Select(id => new UserLocation { UserId = user.Id, LocationId = id }));
 
         var created = await userManager.CreateAsync(user, account.Password).ConfigureAwait(false);
-        ThrowIfFailed(created);
+        IdentityErrors.ThrowIfFailed(created);
 
         var roleAdded = await userManager.AddToRoleAsync(user, account.Role).ConfigureAwait(false);
-        ThrowIfFailed(roleAdded);
+        IdentityErrors.ThrowIfFailed(roleAdded);
 
         return user.Id;
     }
@@ -45,7 +42,10 @@ public sealed class UserAccountService(UserManager<AppUser> userManager, AppDbCo
         CancellationToken ct)
     {
         // Users are not under the global tenant filter (see AppUser), so filter by company explicitly.
-        var users = db.Users.AsNoTracking().Where(u => u.CompanyId == companyId);
+        // Customers of the company are users too, but never part of the staff list.
+        var users = db.Users.AsNoTracking()
+            .Where(u => u.CompanyId == companyId)
+            .Where(u => !db.UserRoles.Any(ur => ur.UserId == u.Id && db.Roles.Any(r => r.Id == ur.RoleId && r.Name == Roles.Customer)));
         if (locationIds is not null)
         {
             users = users.Where(u => u.Locations.Any(l => locationIds.Contains(l.LocationId)));
@@ -76,42 +76,4 @@ public sealed class UserAccountService(UserManager<AppUser> userManager, AppDbCo
             .Where(u => u.Id == userId && u.CompanyId == tenant.CompanyId && u.Locations.Any(l => l.LocationId == locationId))
             .Where(u => db.UserRoles.Any(ur => ur.UserId == u.Id && db.Roles.Any(r => r.Id == ur.RoleId && r.Name == Roles.Driver)))
             .AnyAsync(ct);
-
-    private static void ThrowIfFailed(IdentityResult result)
-    {
-        if (result.Succeeded)
-        {
-            return;
-        }
-
-        if (result.Errors.Any(e => e.Code is nameof(IdentityErrorDescriber.DuplicateUserName)
-                                         or nameof(IdentityErrorDescriber.DuplicateEmail)))
-        {
-            throw new ConflictException(ErrorCodes.UserEmailTaken);
-        }
-
-        var failures = result.Errors.Select(e => new ValidationFailure(
-            e.Code.StartsWith("Password", StringComparison.Ordinal) ? "Password" : "Email",
-            e.Description)
-        {
-            ErrorCode = "validation." + ToSnakeCase(e.Code),
-        });
-        throw new ValidationException(failures);
-    }
-
-    private static string ToSnakeCase(string value)
-    {
-        var builder = new StringBuilder(value.Length + 8);
-        for (var i = 0; i < value.Length; i++)
-        {
-            if (char.IsUpper(value[i]) && i > 0)
-            {
-                builder.Append('_');
-            }
-
-            builder.Append(char.ToLowerInvariant(value[i]));
-        }
-
-        return builder.ToString();
-    }
 }

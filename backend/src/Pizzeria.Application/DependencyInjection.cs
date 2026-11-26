@@ -1,5 +1,6 @@
 using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
+using Pizzeria.Application.Customers;
 using Pizzeria.Application.Delivery;
 using Pizzeria.Application.Drivers;
 using Pizzeria.Application.Locations;
@@ -42,6 +43,7 @@ public static class DependencyInjection
         services.AddScoped<PrintingService>();
         services.AddScoped<AgentSessionService>();
         services.AddScoped<AgentAuthenticationService>();
+        services.AddScoped<CustomerAccountService>();
         services.AddSingleton<IPrintJobNotifier, NullPrintJobNotifier>();
         services.AddScoped<OrderTrackingService>();
         services.AddScoped<OrderQueueService>();

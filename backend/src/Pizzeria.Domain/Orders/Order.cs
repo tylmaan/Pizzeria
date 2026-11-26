@@ -38,7 +38,8 @@ public sealed class OrderStatusChange
     public string? Reason { get; private set; }
 }
 
-public sealed record OrderCustomer(string Name, string Phone);
+/// <param name="AccountId">The signed-in customer's account, when not ordering as a guest.</param>
+public sealed record OrderCustomer(string Name, string Phone, Guid? AccountId = null);
 
 /// <summary>Delivery terms resolved from the zone the address lies in.</summary>
 public sealed record DeliveryTerms(Address Address, GeoPoint? Point, string? AddressNotes, decimal Fee, decimal MinOrderValue);
@@ -99,6 +100,9 @@ public sealed class Order : ILocationEntity
     public string CustomerName { get; private set; } = null!;
 
     public string CustomerPhone { get; private set; } = null!;
+
+    /// <summary>Customer account (order history). <c>null</c> for guests and phone orders.</summary>
+    public Guid? CustomerId { get; private set; }
 
     public Address? DeliveryAddress { get; private set; }
 
@@ -168,6 +172,7 @@ public sealed class Order : ILocationEntity
             PaymentStatus = paymentMethod == PaymentMethod.Online ? PaymentStatus.PendingOnline : PaymentStatus.Unpaid,
             CustomerName = name,
             CustomerPhone = phone,
+            CustomerId = customer.AccountId,
             Notes = Trim(notes, NotesMaxLength),
             PlacedAt = now,
         };

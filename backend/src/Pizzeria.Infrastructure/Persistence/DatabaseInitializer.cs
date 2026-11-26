@@ -59,7 +59,7 @@ public static partial class DatabaseInitializer
         var userManager = provider.GetRequiredService<UserManager<AppUser>>();
 
         if (!string.IsNullOrWhiteSpace(seed.PlatformAdminEmail) && !string.IsNullOrWhiteSpace(seed.PlatformAdminPassword)
-            && await userManager.FindByEmailAsync(seed.PlatformAdminEmail).ConfigureAwait(false) is null)
+            && await userManager.FindByNameAsync(seed.PlatformAdminEmail).ConfigureAwait(false) is null)
         {
             await accounts.CreateAsync(
                 new NewUserAccount(null, seed.PlatformAdminEmail, seed.PlatformAdminPassword, "Platform admin", Roles.PlatformAdmin, []),

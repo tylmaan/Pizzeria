@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Pizzeria.Application.Abstractions;
 using Pizzeria.Application.Tenancy;
 using Pizzeria.Domain.Common;
+using Pizzeria.Domain.Customers;
 using Pizzeria.Domain.Delivery;
 using Pizzeria.Domain.Drivers;
 using Pizzeria.Domain.Menu;
@@ -47,6 +48,8 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options, ITenant
     public DbSet<PrintAgent> PrintAgents => Set<PrintAgent>();
 
     public DbSet<PrintJob> PrintJobs => Set<PrintJob>();
+
+    public DbSet<SavedAddress> SavedAddresses => Set<SavedAddress>();
 
     public DbSet<UserLocation> UserLocations => Set<UserLocation>();
 

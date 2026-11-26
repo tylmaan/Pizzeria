@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using Microsoft.Extensions.Options;
 using Pizzeria.Application.Tenancy;
+using Pizzeria.Domain.Identity;
 
 namespace Pizzeria.Api.Tenancy;
 
@@ -25,10 +26,23 @@ public sealed class TenantResolver(TenantContext tenant, ICompanyResolver compan
     {
         if (user.Identity?.IsAuthenticated == true)
         {
+            var companyId = ParseGuid(user.FindFirstValue(TenantClaims.CompanyId));
+            var roles = user.FindAll(ClaimTypes.Role).Select(c => c.Value).ToList();
+
+            // A customer account belongs to one shop: in another company's shop the customer is just a guest.
+            if (roles is [Roles.Customer]
+                && FindShopSlug(host, options.Value.ShopRootDomain) is { } customerShop
+                && await companies.FindCompanyIdBySlugAsync(customerShop, ct).ConfigureAwait(false) is { } shopCompanyId
+                && shopCompanyId != companyId)
+            {
+                tenant.SetAnonymous(shopCompanyId);
+                return;
+            }
+
             tenant.SetUser(
                 Guid.Parse(user.FindFirstValue(ClaimTypes.NameIdentifier)!),
-                ParseGuid(user.FindFirstValue(TenantClaims.CompanyId)),
-                user.FindAll(ClaimTypes.Role).Select(c => c.Value),
+                companyId,
+                roles,
                 user.FindAll(TenantClaims.LocationId).Select(c => Guid.Parse(c.Value)));
         }
         else if (FindShopSlug(host, options.Value.ShopRootDomain) is { } slug

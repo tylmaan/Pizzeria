@@ -136,6 +136,7 @@ api.MapUserEndpoints();
 api.MapMenuEndpoints();
 api.MapDeliveryEndpoints();
 api.MapShopEndpoints();
+api.MapShopAccountEndpoints();
 api.MapOrderEndpoints();
 api.MapDriverEndpoints();
 api.MapPaymentEndpoints(builder.Configuration);

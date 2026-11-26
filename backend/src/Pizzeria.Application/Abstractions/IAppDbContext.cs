@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Pizzeria.Domain.Customers;
 using Pizzeria.Domain.Delivery;
 using Pizzeria.Domain.Drivers;
 using Pizzeria.Domain.Menu;
@@ -40,6 +41,8 @@ public interface IAppDbContext
     DbSet<PrintAgent> PrintAgents { get; }
 
     DbSet<PrintJob> PrintJobs { get; }
+
+    DbSet<SavedAddress> SavedAddresses { get; }
 
     DatabaseFacade Database { get; }
 

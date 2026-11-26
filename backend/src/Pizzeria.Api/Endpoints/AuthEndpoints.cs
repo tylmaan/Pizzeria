@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using Pizzeria.Application.Errors;
 using Pizzeria.Application.Tenancy;
+using Pizzeria.Domain.Identity;
 using Pizzeria.Infrastructure.Identity;
 
 namespace Pizzeria.Api.Endpoints;
@@ -49,23 +50,28 @@ public static class AuthEndpoints
         LoginRequest request,
         SignInManager<AppUser> signInManager)
     {
-        signInManager.AuthenticationScheme = IdentityConstants.BearerScheme;
-        var result = await signInManager
-            .PasswordSignInAsync(request.Email, request.Password, isPersistent: false, lockoutOnFailure: true)
-            .ConfigureAwait(false);
-
-        if (result.Succeeded)
+        // Customers sign in through their shop (company-scoped user names), never into the staff panel.
+        var user = await signInManager.UserManager.FindByNameAsync(request.Email).ConfigureAwait(false);
+        if (user is null || await signInManager.UserManager.IsInRoleAsync(user, Roles.Customer).ConfigureAwait(false))
         {
-            return TypedResults.Empty;
+            return LoginFailed(SignInResult.Failed);
         }
 
-        return TypedResults.Problem(
+        signInManager.AuthenticationScheme = IdentityConstants.BearerScheme;
+        var result = await signInManager
+            .PasswordSignInAsync(user, request.Password, isPersistent: false, lockoutOnFailure: true)
+            .ConfigureAwait(false);
+
+        return result.Succeeded ? TypedResults.Empty : LoginFailed(result);
+    }
+
+    internal static ProblemHttpResult LoginFailed(SignInResult result) =>
+        TypedResults.Problem(
             statusCode: StatusCodes.Status401Unauthorized,
             extensions: new Dictionary<string, object?>
             {
                 ["code"] = result.IsLockedOut ? ErrorCodes.LockedOut : ErrorCodes.InvalidCredentials,
             });
-    }
 
     /// <summary>
     /// Issues a new token pair. Claims are rebuilt from the database, so role and location changes apply;
