@@ -59,6 +59,7 @@ public sealed class PizzeriaApiFactory : WebApplicationFactory<Program>, IAsyncL
         builder.UseSetting("RateLimiting:LoginAttemptsPerMinute", "10000");
         builder.UseSetting("RateLimiting:DeliveryChecksPerMinute", "10000");
         builder.UseSetting("RateLimiting:OrdersPerMinute", "10000");
+        builder.UseSetting("Payments:Provider", "Fake");
         builder.ConfigureTestServices(services =>
         {
             services.AddSingleton<IGeocodingService>(Geocoder);

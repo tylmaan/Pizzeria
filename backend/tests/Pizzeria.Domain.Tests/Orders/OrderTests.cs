@@ -72,9 +72,44 @@ public sealed class OrderTests
     }
 
     [Fact]
-    public void Place_OnlinePaymentIsNotAvailableYet()
+    public void OnlineOrder_WaitsForPaymentBeforeItCanBeAccepted()
     {
-        AssertFails(OrderErrors.PaymentMethodNotAvailable, () => Delivery(payment: PaymentMethod.Online));
+        var order = Delivery(payment: PaymentMethod.Online);
+
+        Assert.Equal(PaymentStatus.PendingOnline, order.PaymentStatus);
+        Assert.True(order.AwaitingPayment);
+        Assert.Null(order.NextStatus);
+        AssertFails(OrderErrors.AwaitingPayment, () => order.Accept(Staff, Now));
+    }
+
+    [Fact]
+    public void MarkPaidOnline_UnblocksAcceptanceAndIsIdempotent()
+    {
+        var order = Delivery(payment: PaymentMethod.Online);
+
+        order.MarkPaidOnline(Now);
+        order.MarkPaidOnline(Now);
+        order.Accept(Staff, Now);
+
+        Assert.Equal(PaymentStatus.Paid, order.PaymentStatus);
+        Assert.Equal(OrderStatus.Accepted, order.Status);
+        Assert.Single(order.StatusHistory, h => h.Reason == "paid online");
+    }
+
+    [Fact]
+    public void MarkPaidOnline_ForCashOrder_Throws()
+    {
+        AssertFails(OrderErrors.PaymentMethodNotAvailable, () => Delivery().MarkPaidOnline(Now));
+    }
+
+    [Fact]
+    public void OnlinePaidOrder_StaysPaidAfterDelivery()
+    {
+        var order = Delivery(payment: PaymentMethod.Online);
+        order.MarkPaidOnline(Now);
+        Advance(order, 6);
+
+        Assert.Equal((OrderStatus.Delivered, PaymentStatus.Paid), (order.Status, order.PaymentStatus));
     }
 
     [Fact]

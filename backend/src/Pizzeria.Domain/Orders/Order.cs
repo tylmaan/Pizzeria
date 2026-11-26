@@ -153,12 +153,6 @@ public sealed class Order : ILocationEntity
             throw new DomainException(OrderErrors.InvalidCustomer);
         }
 
-        // Paying online needs a payment provider (stage 2); until then only payment on delivery/pickup.
-        if (paymentMethod == PaymentMethod.Online)
-        {
-            throw new DomainException(OrderErrors.PaymentMethodNotAvailable);
-        }
-
         var order = new Order
         {
             Id = Guid.CreateVersion7(now),
@@ -170,7 +164,8 @@ public sealed class Order : ILocationEntity
             Fulfillment = delivery is null ? FulfillmentType.Pickup : FulfillmentType.Delivery,
             Status = OrderStatus.New,
             PaymentMethod = paymentMethod,
-            PaymentStatus = PaymentStatus.Unpaid,
+            // Online orders wait for the payment provider's confirmation before the restaurant may accept them.
+            PaymentStatus = paymentMethod == PaymentMethod.Online ? PaymentStatus.PendingOnline : PaymentStatus.Unpaid,
             CustomerName = name,
             CustomerPhone = phone,
             Notes = Trim(notes, NotesMaxLength),
@@ -213,6 +208,7 @@ public sealed class Order : ILocationEntity
     /// </summary>
     public OrderStatus? NextStatus => Status switch
     {
+        OrderStatus.New when AwaitingPayment => null,
         OrderStatus.New => OrderStatus.Accepted,
         OrderStatus.Accepted => OrderStatus.InPreparation,
         OrderStatus.InPreparation => OrderStatus.Ready,
@@ -222,7 +218,38 @@ public sealed class Order : ILocationEntity
         _ => null,
     };
 
-    public void Accept(Guid? byUserId, DateTimeOffset now) => MoveTo(OrderStatus.Accepted, byUserId, now);
+    /// <summary>An online order whose payment has not been confirmed yet.</summary>
+    public bool AwaitingPayment => PaymentStatus == PaymentStatus.PendingOnline;
+
+    public void Accept(Guid? byUserId, DateTimeOffset now)
+    {
+        if (AwaitingPayment)
+        {
+            throw new DomainException(OrderErrors.AwaitingPayment);
+        }
+
+        MoveTo(OrderStatus.Accepted, byUserId, now);
+    }
+
+    /// <summary>
+    /// The payment provider confirmed the online payment. Idempotent: a repeated confirmation changes nothing.
+    /// A cancelled order is still marked paid (the money arrived and has to be refunded).
+    /// </summary>
+    public void MarkPaidOnline(DateTimeOffset now)
+    {
+        if (PaymentMethod != PaymentMethod.Online)
+        {
+            throw new DomainException(OrderErrors.PaymentMethodNotAvailable);
+        }
+
+        if (PaymentStatus == PaymentStatus.Paid)
+        {
+            return;
+        }
+
+        PaymentStatus = PaymentStatus.Paid;
+        _statusHistory.Add(new OrderStatusChange(Status, Status, now, null, "paid online"));
+    }
 
     public void StartPreparation(Guid? byUserId, DateTimeOffset now) => MoveTo(OrderStatus.InPreparation, byUserId, now);
 

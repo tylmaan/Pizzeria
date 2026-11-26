@@ -59,4 +59,5 @@ public static class OrderErrors
     public const string CancellationReasonRequired = "order.cancellation_reason_required";
     public const string InvalidCustomer = "order.invalid_customer";
     public const string PaymentMethodNotAvailable = "order.payment_method_not_available";
+    public const string AwaitingPayment = "order.awaiting_payment";
 }

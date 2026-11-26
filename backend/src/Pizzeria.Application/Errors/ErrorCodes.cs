@@ -33,6 +33,10 @@ public static class ErrorCodes
 
     public const string ShiftNotFound = "shift.not_found";
 
+    public const string PaymentNotFound = "payment.not_found";
+    public const string PaymentProviderNotFound = "payment.provider_not_found";
+    public const string InvalidSignature = "payment.invalid_signature";
+
     public const string UserEmailTaken = "user.email_taken";
     public const string RoleNotAssignable = "user.role_not_assignable";
     public const string LocationsRequired = "user.locations_required";

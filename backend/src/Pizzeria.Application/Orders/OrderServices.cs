@@ -5,6 +5,7 @@ using Pizzeria.Application.Delivery;
 using Pizzeria.Application.Errors;
 using Pizzeria.Application.Locations;
 using Pizzeria.Application.Menu;
+using Pizzeria.Application.Payments;
 using Pizzeria.Application.Tenancy;
 using Pizzeria.Domain.Common;
 using Pizzeria.Domain.Menu;
@@ -15,7 +16,7 @@ using Location = Pizzeria.Domain.Tenancy.Location;
 namespace Pizzeria.Application.Orders;
 
 /// <summary>Public shop data for the company resolved from the host name.</summary>
-public sealed class ShopService(IAppDbContext db, ITenantContext tenant, MenuService menu)
+public sealed class ShopService(IAppDbContext db, ITenantContext tenant, MenuService menu, IPaymentProviderResolver paymentProviders)
 {
     public async Task<ShopDto> GetAsync(CancellationToken ct)
     {
@@ -43,7 +44,8 @@ public sealed class ShopService(IAppDbContext db, ITenantContext tenant, MenuSer
         return new ShopDto(
             company.Name,
             locations.ConvertAll(l => new ShopLocationDto(l.Id, l.Name, AddressDto.From(l.Address))),
-            full with { Categories = categories, Products = products, ModifierGroups = groups });
+            full with { Categories = categories, Products = products, ModifierGroups = groups },
+            paymentProviders.ForCompany(company.Id) is not null);
     }
 }
 
@@ -58,6 +60,8 @@ public sealed class PlaceOrderService(
     DeliveryResolver deliveryResolver,
     IOrderNumberGenerator numbers,
     IOrderNotifier notifier,
+    IPaymentProviderResolver paymentProviders,
+    PaymentService payments,
     IValidator<PlaceOrderRequest> validator)
 {
     public async Task<PlacedOrderDto> PlaceAsync(PlaceOrderRequest request, OrderSource source, CancellationToken ct)
@@ -68,6 +72,13 @@ public sealed class PlaceOrderService(
         }
 
         await validator.ValidateAndThrowAsync(request, ct).ConfigureAwait(false);
+
+        // Online payment: only for shop orders and only when the company has a payment provider set up.
+        var paysOnline = request.PaymentMethod == PaymentMethod.Online;
+        if (paysOnline && (source != OrderSource.Online || paymentProviders.ForCompany(tenant.CompanyId.Value) is null))
+        {
+            throw new UnprocessableException(OrderErrors.PaymentMethodNotAvailable);
+        }
 
         var (location, delivery) = await ResolveFulfillmentAsync(request, ct).ConfigureAwait(false);
         var lines = await PriceItemsAsync(request.Items, ct).ConfigureAwait(false);
@@ -90,7 +101,8 @@ public sealed class PlaceOrderService(
         await db.SaveChangesAsync(ct).ConfigureAwait(false);
         await notifier.OrderChangedAsync(order, ct).ConfigureAwait(false);
 
-        return new PlacedOrderDto(order.Id, order.Number, order.TrackingToken, order.Total);
+        var redirect = paysOnline ? await payments.StartAsync(order, ct).ConfigureAwait(false) : null;
+        return new PlacedOrderDto(order.Id, order.Number, order.TrackingToken, order.Total, redirect?.RedirectUrl);
     }
 
     /// <summary>"Day" of a location for numbering and reports is its local calendar day.</summary>

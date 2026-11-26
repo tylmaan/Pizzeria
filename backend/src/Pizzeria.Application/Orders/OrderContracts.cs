@@ -5,7 +5,8 @@ using Pizzeria.Domain.Orders;
 namespace Pizzeria.Application.Orders;
 
 /// <summary>Public data of a company shop: name, locations for pickup and the orderable menu.</summary>
-public sealed record ShopDto(string CompanyName, IReadOnlyList<ShopLocationDto> Locations, MenuDto Menu);
+/// <param name="OnlinePayments">Whether the company accepts online payments (has a payment provider set up).</param>
+public sealed record ShopDto(string CompanyName, IReadOnlyList<ShopLocationDto> Locations, MenuDto Menu, bool OnlinePayments);
 
 public sealed record ShopLocationDto(Guid Id, string Name, AddressDto Address);
 
@@ -34,7 +35,8 @@ public sealed record PlaceOrderRequest(
     string? Notes,
     IReadOnlyList<OrderItemInput> Items);
 
-public sealed record PlacedOrderDto(Guid Id, int Number, string TrackingToken, decimal Total);
+/// <param name="PaymentRedirectUrl">Where to send the customer to pay (online payment only).</param>
+public sealed record PlacedOrderDto(Guid Id, int Number, string TrackingToken, decimal Total, string? PaymentRedirectUrl);
 
 public sealed record OrderItemModifierDto(string Name, decimal Price);
 
