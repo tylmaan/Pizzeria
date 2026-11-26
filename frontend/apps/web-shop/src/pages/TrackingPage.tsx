@@ -1,8 +1,11 @@
 import { errorCodeOf, type OrderStatus } from '@pizzeria/api-client';
 import { formatMoney, useCodeTranslations, useTranslation } from '@pizzeria/i18n';
 import { Alert } from '@pizzeria/ui';
+import { lazy, Suspense } from 'react';
 import { useParams } from 'react-router';
-import { useTracking } from '../app/services';
+import { useDriverPosition, useTracking } from '../app/services';
+
+const DriverMap = lazy(() => import('./DriverMap'));
 
 const deliverySteps: OrderStatus[] = ['New', 'Accepted', 'InPreparation', 'Ready', 'InDelivery', 'Delivered'];
 const pickupSteps: OrderStatus[] = ['New', 'Accepted', 'InPreparation', 'Ready', 'PickedUp'];
@@ -12,6 +15,8 @@ export function TrackingPage() {
   const codes = useCodeTranslations();
   const { token = '' } = useParams();
   const tracking = useTracking(token);
+  const onTheWay = tracking.data?.status === 'InDelivery';
+  const driver = useDriverPosition(token, onTheWay);
 
   if (tracking.isError) {
     return <Alert>{codes.error(errorCodeOf(tracking.error))}</Alert>;
@@ -51,6 +56,12 @@ export function TrackingPage() {
             </li>
           ))}
         </ol>
+      )}
+
+      {onTheWay && driver.data?.position && (
+        <Suspense fallback={null}>
+          <DriverMap latitude={driver.data.position.latitude} longitude={driver.data.position.longitude} label={t('shop.driverOnMap')} />
+        </Suspense>
       )}
 
       <ul className="flex flex-col gap-1 rounded-xl bg-white p-3 shadow-sm">

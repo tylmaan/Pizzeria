@@ -84,3 +84,14 @@ export function useTracking(token: string) {
     refetchInterval: (query) => (live || (query.state.data && finished.has(query.state.data.status)) ? false : 15_000),
   });
 }
+
+/** The driver's position while the order is on its way (refreshed by the same live feed as the status). */
+export function useDriverPosition(token: string, enabled: boolean) {
+  const api = useApi();
+  return useQuery({
+    queryKey: ['tracking', token, 'driver'],
+    queryFn: () => unwrap(api.GET('/api/shop/orders/{token}/driver', { params: { path: { token } } })),
+    enabled,
+    refetchInterval: 20_000,
+  });
+}

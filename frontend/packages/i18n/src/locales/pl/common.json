@@ -300,7 +300,8 @@
     "orderFrom": "Lokal: {{location}}",
     "trackingHint": "Zachowaj ten link, aby śledzić zamówienie.",
     "cancelled": "Zamówienie anulowane: {{reason}}",
-    "notFound": "Nie znaleziono zamówienia."
+    "notFound": "Nie znaleziono zamówienia.",
+    "driverOnMap": "Twój kierowca jest w drodze"
   },
   "orderStatus": {
     "New": "Przyjęte do realizacji",
@@ -431,5 +432,19 @@
     "settle": "Rozlicz",
     "discrepancy": "Różnica: {{amount}}",
     "noDiscrepancy": "Bez różnic"
+  },
+  "gps": {
+    "waiting": "Szukam sygnału GPS…",
+    "ok": "Lokalizacja jest wysyłana do lokalu.",
+    "stale": "Brak aktualnej pozycji — trzymaj aplikację otwartą na wierzchu.",
+    "denied": "Zezwól aplikacji na dostęp do lokalizacji, aby lokal widział Twoje kursy.",
+    "unavailable": "Ten telefon nie udostępnia lokalizacji."
+  },
+  "liveMap": {
+    "show": "Pokaż mapę kierowców",
+    "hide": "Ukryj mapę kierowców",
+    "title": "Mapa kierowców",
+    "none": "Żaden kierowca na zmianie nie wysyła teraz pozycji.",
+    "driverAge": "{{name}} · {{seconds}} s temu"
   }
 }

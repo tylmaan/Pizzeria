@@ -39,6 +39,7 @@ export type DriverDto = Schemas['DriverDto'];
 export type DriverShiftDto = Schemas['DriverShiftDto'];
 export type DriverShiftStatus = Schemas['DriverShiftStatus'];
 export type CurrentShiftDto = Schemas['CurrentShiftDto'];
+export type DriverPositionDto = Schemas['DriverPositionDto'];
 export type MeResponse = Schemas['MeResponse'];
 export type UpdateLocationRequest = Schemas['UpdateLocationRequest'];
 export type UserDto = Schemas['UserDto'];

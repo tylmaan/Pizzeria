@@ -338,7 +338,9 @@ Cel: jedno zamówienie przechodzi całą drogę od klienta do dostarczenia.
 **Etap 1 zrobiony.** Uprawnienia do zmian statusu (`OrderPermissions`): obsługa, kierownik i admin firmy mogą wszystko. Kuchnia: „w przygotowaniu” i „gotowe”. Kierowca: „w drodze” i „dostarczone”, tylko dla swoich zamówień (inne widzi jako 404). Anulowanie wymaga powodu. Kuchnia dzwoni, gdy zamówienie zostanie przyjęte (wtedy trafia do kuchni), panel przy nowym zamówieniu, kierowca przy przypisaniu kursu.
 
 ### Etap 2
-- GPS na żywo (lokal + klient), rozliczenie zmiany kierowcy
+- ✅ GPS na żywo (lokal + klient), rozliczenie zmiany kierowcy. Pozycja idzie REST-em (`POST /api/driver/position`) tylko przy otwartej zmianie, a powiadomienie `DriverMoved` przez SignalR. Ślad kasuje `DriverPositionRetention` (Api/Background) po `DriverTracking:RetentionDays` (domyślnie 30). Mapa kierowców w panelu jest zwijana i odpytuje API co 15 s.
+- Następne: płatności online (fake provider), konta klientów, agent lokalny + drukarki, raporty
+- Testy frontendu: `pnpm test` uruchamia pakiety po kolei (`--workspace-concurrency=1`), bo równoległe jsdom potrafiło skończyć się brakiem pamięci
 - Płatności online (pierwszy operator), konta klientów
 - Agent lokalny + drukarka bonów, potem drukarka fiskalna (pierwszy model)
 - Raporty

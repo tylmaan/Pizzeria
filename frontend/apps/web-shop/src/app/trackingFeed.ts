@@ -12,6 +12,7 @@ export const signalRTrackingFeed: TrackingFeed = (token, onChange, onConnected) 
     .build();
 
   connection.on('OrderChanged', () => onChange());
+  connection.on('DriverMoved', () => onChange());
   connection.onreconnecting(() => onConnected(false));
   connection.onreconnected(async () => {
     await connection.invoke('TrackOrder', token);

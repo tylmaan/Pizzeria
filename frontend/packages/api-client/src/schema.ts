@@ -854,6 +854,80 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/driver/position": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["ReportPositionRequest"];
+                };
+            };
+            responses: {
+                /** @description No Content */
+                204: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/locations/{locationId}/drivers/positions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    locationId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["DriverPositionDto"][];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/shop": {
         parameters: {
             query?: never;
@@ -953,6 +1027,43 @@ export interface paths {
                     };
                     content: {
                         "application/json": components["schemas"]["OrderTrackingDto"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/shop/orders/{token}/driver": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    token: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["OrderDriverPositionDto"];
                     };
                 };
             };
@@ -1534,6 +1645,17 @@ export interface components {
             id: string;
             displayName: string;
         };
+        DriverPositionDto: {
+            /** Format: uuid */
+            driverId: string;
+            driverName: null | string;
+            /** Format: double */
+            latitude: number;
+            /** Format: double */
+            longitude: number;
+            /** Format: date-time */
+            recordedAt: string;
+        };
         DriverShiftDto: {
             /** Format: uuid */
             id: string;
@@ -1638,6 +1760,9 @@ export interface components {
             name: string;
             isActive: boolean;
             prices: components["schemas"]["PriceDto"][];
+        };
+        OrderDriverPositionDto: {
+            position: null | components["schemas"]["DriverPositionDto"];
         };
         OrderItemDto: {
             productName: string;
@@ -1752,6 +1877,14 @@ export interface components {
         };
         RefreshRequest: {
             refreshToken: string;
+        };
+        ReportPositionRequest: {
+            /** Format: double */
+            latitude: number;
+            /** Format: double */
+            longitude: number;
+            /** Format: double */
+            accuracyMeters: null | number;
         };
         SaveCategoryRequest: {
             name: string;

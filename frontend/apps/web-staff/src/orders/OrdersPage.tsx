@@ -1,11 +1,14 @@
 import { errorCodeOf, Roles, type OrderStatus, type StaffOrderDto } from '@pizzeria/api-client';
 import { useCodeTranslations, useTranslation } from '@pizzeria/i18n';
-import { Alert, buttonClassName, SelectField } from '@pizzeria/ui';
-import { useEffect } from 'react';
+import { Alert, Button, buttonClassName, SelectField } from '@pizzeria/ui';
+import { lazy, Suspense, useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router';
 import { hasAnyRole, useCurrentUser } from '../auth/session';
 import { useLocations } from '../company/queries';
 import { OrderCard } from './OrderCard';
+
+// Leaflet is only loaded when someone opens the map.
+const LiveMap = lazy(() => import('./LiveMap').then((m) => ({ default: m.LiveMap })));
 import { useCurrentLocationId, useNow, useOrders, useOrdersLive } from './queries';
 
 const columns: { key: 'New' | 'InProgress' | 'Ready' | 'OnTheWay'; statuses: OrderStatus[] }[] = [
@@ -27,6 +30,8 @@ export function OrdersPage() {
   const orders = useOrders(locationId, 'Active', live);
   const now = useNow();
   const canCancel = hasAnyRole(user, [Roles.CompanyAdmin, Roles.LocationManager, Roles.Staff]);
+  const [showMap, setShowMap] = useState(false);
+  const location = locations.data?.find((l) => l.id === locationId);
 
   // "N" opens a new phone order — the most frequent action, reachable without the mouse.
   useEffect(() => {
@@ -66,6 +71,15 @@ export function OrdersPage() {
       </div>
 
       {orders.isError && <Alert>{codes.error(errorCodeOf(orders.error))}</Alert>}
+
+      <Button variant="secondary" className="self-start" aria-expanded={showMap} onClick={() => setShowMap((v) => !v)}>
+        {showMap ? t('liveMap.hide') : t('liveMap.show')}
+      </Button>
+      {showMap && (
+        <Suspense fallback={<p>{t('common.loading')}</p>}>
+          <LiveMap locationId={locationId} orders={orders.data ?? []} center={location?.position ?? null} />
+        </Suspense>
+      )}
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
         {columns.map((column) => {
