@@ -10,7 +10,8 @@
     "locations": "Lokale",
     "staff": "Pracownicy",
     "mainMenu": "Menu główne",
-    "menu": "Menu"
+    "menu": "Menu",
+    "shifts": "Rozliczenia"
   },
   "placeholder": {
     "comingSoon": "Ta sekcja jest w budowie.",
@@ -145,6 +146,14 @@
       "no_next_status": "To zamówienie czeka na przypisanie kierowcy.",
       "status_change_not_allowed": "Nie możesz wykonać tej zmiany statusu.",
       "driver_not_found": "Nie znaleziono kierowcy w tym lokalu."
+    },
+    "shift": {
+      "already_open": "Masz już otwartą zmianę.",
+      "not_open": "Zmiana nie jest otwarta.",
+      "not_closed": "Zmiana nie jest zakończona.",
+      "discrepancy_comment_required": "Kwota się nie zgadza — dodaj komentarz.",
+      "invalid_amount": "Nieprawidłowa kwota.",
+      "not_found": "Nie znaleziono zmiany."
     }
   },
   "validation": {
@@ -394,5 +403,33 @@
     "delivered": "Dostarczone",
     "waiting": "Czeka w lokalu",
     "onTheWay": "W drodze"
+  },
+  "shifts": {
+    "notStarted": "Zmiana nie jest rozpoczęta.",
+    "startingCash": "Pogotówka (zł)",
+    "start": "Rozpocznij zmianę",
+    "openSince": "Zmiana od {{time}} · pogotówka {{cash}}",
+    "end": "Zakończ zmianę",
+    "tips": "Napiwki (zł)",
+    "confirmEnd": "Zakończ i podsumuj",
+    "summary": "Podsumowanie zmiany",
+    "deliveries": "Kursy",
+    "cash": "Gotówka od klientów",
+    "card": "Karta u klienta",
+    "online": "Opłacone online",
+    "tipsTotal": "Napiwki",
+    "toHandOver": "Do oddania w lokalu",
+    "close": "Zamknij",
+    "needsShift": "Rozpocznij zmianę, aby rozliczać kursy.",
+    "title": "Rozliczenia kierowców",
+    "waiting": "Do rozliczenia",
+    "settled": "Rozliczone",
+    "none": "Brak zmian do rozliczenia.",
+    "driverRange": "{{driver}} · {{from}}–{{to}}",
+    "countedCash": "Policzona gotówka (zł)",
+    "comment": "Komentarz (wymagany przy różnicy)",
+    "settle": "Rozlicz",
+    "discrepancy": "Różnica: {{amount}}",
+    "noDiscrepancy": "Bez różnic"
   }
 }

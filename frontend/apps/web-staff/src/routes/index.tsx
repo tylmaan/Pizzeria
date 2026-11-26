@@ -7,6 +7,7 @@ import { LocationsPage } from '../company/LocationsPage';
 import { NewStaffPage } from '../company/NewStaffPage';
 import { StaffPage } from '../company/StaffPage';
 import { DriverPage } from '../driver/DriverPage';
+import { ShiftsPage } from '../driver/ShiftsPage';
 import { KitchenPage } from '../kitchen/KitchenPage';
 import { EditCategoryPage, NewCategoryPage } from '../menu/CategoryFormPage';
 import { MenuPage } from '../menu/MenuPage';
@@ -53,6 +54,14 @@ export const routes: RouteObject[] = [
         element: (
           <RequireRole roles={rolesFor('/driver')}>
             <DriverPage />
+          </RequireRole>
+        ),
+      },
+      {
+        path: 'shifts',
+        element: (
+          <RequireRole roles={rolesFor('/shifts')}>
+            <ShiftsPage />
           </RequireRole>
         ),
       },

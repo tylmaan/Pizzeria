@@ -2,6 +2,7 @@ import { errorCodeOf, type StaffOrderDto } from '@pizzeria/api-client';
 import { formatMoney, useCodeTranslations, useTranslation } from '@pizzeria/i18n';
 import { Alert } from '@pizzeria/ui';
 import { useAdvanceOrder, useCurrentLocationId, useOrders, useOrdersLive } from '../orders/queries';
+import { ShiftPanel } from './ShiftPanel';
 
 /** Google Maps directions: by coordinates when the address was geocoded, by the address text otherwise. */
 export function navigationUrl(order: StaffOrderDto): string {
@@ -30,6 +31,7 @@ export function DriverPage() {
   return (
     <section className="mx-auto flex max-w-md flex-col gap-4">
       <h1 className="text-3xl font-bold">{t('driver.title')}</h1>
+      <ShiftPanel locationId={locationId} />
       <p className="text-sm text-neutral-600">{t('driver.keepOpen')}</p>
       {orders.isError && <Alert>{codes.error(errorCodeOf(orders.error))}</Alert>}
       {orders.data !== undefined && runs.length === 0 && <p className="text-xl">{t('driver.empty')}</p>}

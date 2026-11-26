@@ -1222,6 +1222,199 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/driver/shifts/current": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["CurrentShiftDto"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/driver/shifts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["StartShiftRequest"];
+                };
+            };
+            responses: {
+                /** @description Created */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["DriverShiftDto"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/driver/shifts/current/close": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["CloseShiftRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["DriverShiftDto"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/locations/{locationId}/shifts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: {
+                    status?: components["schemas"]["DriverShiftStatus"];
+                };
+                header?: never;
+                path: {
+                    locationId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["DriverShiftDto"][];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/shifts/{id}/settle": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["SettleShiftRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["DriverShiftDto"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -1255,6 +1448,10 @@ export interface components {
             name: string;
             sizes: components["schemas"]["SizeDto"][];
         };
+        CloseShiftRequest: {
+            /** Format: double */
+            tips: number;
+        };
         CompanyDto: {
             /** Format: uuid */
             id: string;
@@ -1281,6 +1478,9 @@ export interface components {
             displayName: string;
             role: string;
             locationIds: null | string[];
+        };
+        CurrentShiftDto: {
+            shift: null | components["schemas"]["DriverShiftDto"];
         };
         CustomerInput: {
             name: string;
@@ -1334,6 +1534,43 @@ export interface components {
             id: string;
             displayName: string;
         };
+        DriverShiftDto: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            locationId: string;
+            /** Format: uuid */
+            driverId: string;
+            driverName: null | string;
+            status: components["schemas"]["DriverShiftStatus"];
+            /** Format: date-time */
+            startedAt: string;
+            /** Format: date-time */
+            endedAt: null | string;
+            /** Format: double */
+            startingCash: number;
+            /** Format: int32 */
+            deliveriesCount: number;
+            /** Format: double */
+            cashCollected: number;
+            /** Format: double */
+            cardCollected: number;
+            /** Format: double */
+            paidOnline: number;
+            /** Format: double */
+            tips: number;
+            /** Format: double */
+            expectedCash: number;
+            /** Format: double */
+            countedCash: null | number;
+            /** Format: double */
+            discrepancy: null | number;
+            discrepancyComment: null | string;
+            /** Format: date-time */
+            settledAt: null | string;
+        };
+        /** @enum {unknown} */
+        DriverShiftStatus: "Open" | "Closed" | "Settled";
         /** @enum {unknown} */
         FulfillmentType: "Delivery" | "Pickup";
         GeoPointDto: {
@@ -1551,6 +1788,11 @@ export interface components {
             prices: components["schemas"]["PriceDto"][];
             modifierGroupIds: string[];
         };
+        SettleShiftRequest: {
+            /** Format: double */
+            countedCash: number;
+            comment: null | string;
+        };
         ShopDto: {
             companyName: string;
             locations: components["schemas"]["ShopLocationDto"][];
@@ -1607,6 +1849,12 @@ export interface components {
             /** Format: uuid */
             driverId: null | string;
             cancellationReason: null | string;
+        };
+        StartShiftRequest: {
+            /** Format: uuid */
+            locationId: string;
+            /** Format: double */
+            startingCash: number;
         };
         UpdateLocationRequest: {
             name: string;
