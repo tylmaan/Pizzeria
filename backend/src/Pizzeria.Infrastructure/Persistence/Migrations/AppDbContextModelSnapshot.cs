@@ -692,6 +692,147 @@ namespace Pizzeria.Infrastructure.Persistence.Migrations
                     b.ToTable("payments", (string)null);
                 });
 
+            modelBuilder.Entity("Pizzeria.Domain.Printing.PrintAgent", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<Guid>("CompanyId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("company_id");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<bool?>("FiscalPrinterOnline")
+                        .HasColumnType("boolean")
+                        .HasColumnName("fiscal_printer_online");
+
+                    b.Property<bool>("IsRevoked")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_revoked");
+
+                    b.Property<DateTimeOffset?>("LastSeenAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("last_seen_at");
+
+                    b.Property<Guid>("LocationId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("location_id");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("name");
+
+                    b.Property<bool?>("ReceiptPrinterOnline")
+                        .HasColumnType("boolean")
+                        .HasColumnName("receipt_printer_online");
+
+                    b.Property<string>("TokenHash")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)")
+                        .HasColumnName("token_hash");
+
+                    b.HasKey("Id")
+                        .HasName("pk_print_agents");
+
+                    b.HasIndex("CompanyId")
+                        .HasDatabaseName("ix_print_agents_company_id");
+
+                    b.HasIndex("LocationId")
+                        .HasDatabaseName("ix_print_agents_location_id");
+
+                    b.HasIndex("TokenHash")
+                        .IsUnique()
+                        .HasDatabaseName("ix_print_agents_token_hash");
+
+                    b.ToTable("print_agents", (string)null);
+                });
+
+            modelBuilder.Entity("Pizzeria.Domain.Printing.PrintJob", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<int>("Attempts")
+                        .HasColumnType("integer")
+                        .HasColumnName("attempts");
+
+                    b.Property<Guid>("CompanyId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("company_id");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<string>("Error")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)")
+                        .HasColumnName("error");
+
+                    b.Property<string>("Kind")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("kind");
+
+                    b.Property<Guid>("LocationId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("location_id");
+
+                    b.Property<Guid?>("OrderId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("order_id");
+
+                    b.Property<string>("Payload")
+                        .IsRequired()
+                        .HasColumnType("jsonb")
+                        .HasColumnName("payload");
+
+                    b.Property<DateTimeOffset?>("PrintedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("printed_at");
+
+                    b.Property<DateTimeOffset?>("SentAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("sent_at");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("status");
+
+                    b.Property<uint>("xmin")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
+
+                    b.HasKey("Id")
+                        .HasName("pk_print_jobs");
+
+                    b.HasIndex("CompanyId")
+                        .HasDatabaseName("ix_print_jobs_company_id");
+
+                    b.HasIndex("OrderId")
+                        .HasDatabaseName("ix_print_jobs_order_id");
+
+                    b.HasIndex("LocationId", "Status", "CreatedAt")
+                        .HasDatabaseName("ix_print_jobs_location_id_status_created_at");
+
+                    b.ToTable("print_jobs", (string)null);
+                });
+
             modelBuilder.Entity("Pizzeria.Domain.Tenancy.Company", b =>
                 {
                     b.Property<Guid>("Id")
@@ -746,6 +887,12 @@ namespace Pizzeria.Infrastructure.Persistence.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at");
 
+                    b.Property<string>("FiscalReceiptTrigger")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("fiscal_receipt_trigger");
+
                     b.Property<bool>("IsActive")
                         .HasColumnType("boolean")
                         .HasColumnName("is_active");
@@ -759,6 +906,10 @@ namespace Pizzeria.Infrastructure.Persistence.Migrations
                     b.Property<Point>("Position")
                         .HasColumnType("geometry(Point, 4326)")
                         .HasColumnName("position");
+
+                    b.Property<bool>("PrintKitchenTickets")
+                        .HasColumnType("boolean")
+                        .HasColumnName("print_kitchen_tickets");
 
                     b.Property<string>("TimeZoneId")
                         .IsRequired()
@@ -1513,6 +1664,46 @@ namespace Pizzeria.Infrastructure.Persistence.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
                         .HasConstraintName("fk_payments_orders_order_id");
+                });
+
+            modelBuilder.Entity("Pizzeria.Domain.Printing.PrintAgent", b =>
+                {
+                    b.HasOne("Pizzeria.Domain.Tenancy.Company", null)
+                        .WithMany()
+                        .HasForeignKey("CompanyId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_print_agents_companies_company_id");
+
+                    b.HasOne("Pizzeria.Domain.Tenancy.Location", null)
+                        .WithMany()
+                        .HasForeignKey("LocationId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_print_agents_locations_location_id");
+                });
+
+            modelBuilder.Entity("Pizzeria.Domain.Printing.PrintJob", b =>
+                {
+                    b.HasOne("Pizzeria.Domain.Tenancy.Company", null)
+                        .WithMany()
+                        .HasForeignKey("CompanyId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_print_jobs_companies_company_id");
+
+                    b.HasOne("Pizzeria.Domain.Tenancy.Location", null)
+                        .WithMany()
+                        .HasForeignKey("LocationId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_print_jobs_locations_location_id");
+
+                    b.HasOne("Pizzeria.Domain.Orders.Order", null)
+                        .WithMany()
+                        .HasForeignKey("OrderId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("fk_print_jobs_orders_order_id");
                 });
 
             modelBuilder.Entity("Pizzeria.Domain.Tenancy.Location", b =>

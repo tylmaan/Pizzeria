@@ -35,6 +35,9 @@ public static class ErrorCodes
 
     public const string InvalidReportRange = "report.invalid_range";
 
+    public const string AgentNotFound = "printing.agent_not_found";
+    public const string PrintJobNotFound = "printing.job_not_found";
+
     public const string PaymentNotFound = "payment.not_found";
     public const string PaymentProviderNotFound = "payment.provider_not_found";
     public const string InvalidSignature = "payment.invalid_signature";

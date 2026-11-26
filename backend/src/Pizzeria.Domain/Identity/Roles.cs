@@ -19,6 +19,9 @@ public static class Roles
 
     public const string Customer = nameof(Customer);
 
+    /// <summary>The local print agent (device token, not a person). Not an Identity role and never assignable.</summary>
+    public const string Agent = nameof(Agent);
+
     public static readonly IReadOnlyList<string> All =
         [PlatformAdmin, CompanyAdmin, LocationManager, Staff, Kitchen, Driver, Customer];
 

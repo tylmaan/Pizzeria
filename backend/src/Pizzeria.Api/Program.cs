@@ -1,6 +1,7 @@
 using System.Globalization;
 using System.Text.Json.Serialization;
 using System.Threading.RateLimiting;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.BearerToken;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
@@ -14,6 +15,7 @@ using Pizzeria.Api.Tenancy;
 using Pizzeria.Application;
 using Pizzeria.Application.Drivers;
 using Pizzeria.Application.Orders;
+using Pizzeria.Application.Printing;
 using Pizzeria.Infrastructure;
 using Pizzeria.Infrastructure.Persistence;
 using Serilog;
@@ -52,10 +54,12 @@ builder.Services.AddInfrastructure(builder.Configuration).AddSignInManager();
 builder.Services.Configure<TenancyOptions>(builder.Configuration.GetSection(TenancyOptions.SectionName));
 builder.Services.AddScoped<TenantResolver>();
 
-builder.Services.AddSignalR(options => options.AddFilter<HubTenantFilter>());
+builder.Services.AddSignalR(options => options.AddFilter<HubTenantFilter>())
+    .AddJsonProtocol(options => options.PayloadSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 // Replaces the no-op notifier registered by AddApplication.
 builder.Services.AddSingleton<IOrderNotifier, SignalROrderNotifier>();
 builder.Services.AddSingleton<IDriverPositionNotifier, SignalRDriverPositionNotifier>();
+builder.Services.AddSingleton<IPrintJobNotifier, SignalRPrintJobNotifier>();
 
 builder.Services.Configure<DriverTrackingOptions>(builder.Configuration.GetSection(DriverTrackingOptions.SectionName));
 builder.Services.AddSingleton<DriverPositionRetention>();
@@ -81,7 +85,8 @@ builder.Services
                 return Task.CompletedTask;
             },
         };
-    });
+    })
+    .AddScheme<AuthenticationSchemeOptions, AgentTokenAuthenticationHandler>(AgentTokenAuthenticationHandler.SchemeName, null);
 AuthorizationPolicies.Configure(builder.Services.AddAuthorizationBuilder());
 
 // Brute-force protection on top of Identity lockout: login attempts per client IP per minute.
@@ -135,9 +140,11 @@ api.MapOrderEndpoints();
 api.MapDriverEndpoints();
 api.MapPaymentEndpoints(builder.Configuration);
 api.MapReportEndpoints();
+api.MapPrintingEndpoints();
 
 // Anonymous connections are allowed (customer tracking); hub methods check access themselves.
 app.MapHub<OrdersHub>(OrdersHub.Path).AllowAnonymous();
+app.MapHub<AgentHub>(AgentHub.Path).RequireAuthorization(AuthorizationPolicies.Agent);
 
 await DatabaseInitializer.InitializeAsync(app.Services).ConfigureAwait(false);
 

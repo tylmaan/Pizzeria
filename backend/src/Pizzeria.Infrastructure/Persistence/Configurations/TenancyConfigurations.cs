@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Pizzeria.Domain.Delivery;
+using Pizzeria.Domain.Printing;
 using Pizzeria.Domain.Tenancy;
 using Location = Pizzeria.Domain.Tenancy.Location;
 
@@ -28,6 +29,7 @@ internal sealed class LocationConfiguration : IEntityTypeConfiguration<Location>
         builder.Property(l => l.Name).HasMaxLength(Location.NameMaxLength).IsRequired();
         builder.Property(l => l.TimeZoneId).HasMaxLength(64).IsRequired();
         builder.Property(l => l.Position).HasColumnType($"geometry(Point, {Geo.Srid})");
+        builder.Property(l => l.FiscalReceiptTrigger).HasConversion<string>().HasMaxLength(20);
 
         builder.OwnsOne(l => l.Address, address =>
         {

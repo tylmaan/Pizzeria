@@ -1,6 +1,7 @@
 using NetTopologySuite.Geometries;
 using Pizzeria.Domain.Common;
 using Pizzeria.Domain.Delivery;
+using Pizzeria.Domain.Printing;
 
 namespace Pizzeria.Domain.Tenancy;
 
@@ -33,6 +34,23 @@ public sealed class Location : ITenantEntity
     public Point? Position { get; private set; }
 
     public void SetPosition(GeoPoint? position) => Position = position?.ToPoint();
+
+    /// <summary>Print a kitchen ticket when an order is accepted (needs the local agent).</summary>
+    public bool PrintKitchenTickets { get; private set; } = true;
+
+    /// <summary>When to print the fiscal receipt. Default <see cref="FiscalReceiptTrigger.Never"/> until confirmed with the accountant.</summary>
+    public FiscalReceiptTrigger FiscalReceiptTrigger { get; private set; } = FiscalReceiptTrigger.Never;
+
+    public void SetPrinting(bool printKitchenTickets, FiscalReceiptTrigger fiscalReceiptTrigger)
+    {
+        if (!Enum.IsDefined(fiscalReceiptTrigger))
+        {
+            throw new ArgumentOutOfRangeException(nameof(fiscalReceiptTrigger));
+        }
+
+        PrintKitchenTickets = printKitchenTickets;
+        FiscalReceiptTrigger = fiscalReceiptTrigger;
+    }
 
     public static Location Create(Guid companyId, string name, Address address, string? timeZoneId, DateTimeOffset now)
     {

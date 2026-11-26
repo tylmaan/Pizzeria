@@ -9,6 +9,7 @@ using Pizzeria.Domain.Drivers;
 using Pizzeria.Domain.Menu;
 using Pizzeria.Domain.Orders;
 using Pizzeria.Domain.Payments;
+using Pizzeria.Domain.Printing;
 using Pizzeria.Domain.Tenancy;
 using Pizzeria.Infrastructure.Identity;
 
@@ -42,6 +43,10 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options, ITenant
     public DbSet<DriverPosition> DriverPositions => Set<DriverPosition>();
 
     public DbSet<Payment> Payments => Set<Payment>();
+
+    public DbSet<PrintAgent> PrintAgents => Set<PrintAgent>();
+
+    public DbSet<PrintJob> PrintJobs => Set<PrintJob>();
 
     public DbSet<UserLocation> UserLocations => Set<UserLocation>();
 

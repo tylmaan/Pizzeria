@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Pizzeria.Application.Abstractions;
 using Pizzeria.Application.Errors;
+using Pizzeria.Application.Printing;
 using Pizzeria.Application.Tenancy;
 using Pizzeria.Application.Users;
 using Pizzeria.Domain.Identity;
@@ -72,7 +73,8 @@ public sealed class OrderWorkflowService(
     ITenantContext tenant,
     TimeProvider clock,
     IUserAccountService accounts,
-    IOrderNotifier notifier)
+    IOrderNotifier notifier,
+    PrintJobScheduler printing)
 {
     /// <summary>"One tap = next status" (accept, start, ready, picked up, on the way, delivered).</summary>
     public Task<StaffOrderDto> AdvanceAsync(Guid id, CancellationToken ct) =>
@@ -129,6 +131,7 @@ public sealed class OrderWorkflowService(
         await change(order).ConfigureAwait(false);
         await db.SaveChangesAsync(ct).ConfigureAwait(false);
         await notifier.OrderChangedAsync(order, ct).ConfigureAwait(false);
+        await printing.ScheduleAsync(order, ct).ConfigureAwait(false);
         return StaffOrderDto.From(order);
     }
 }

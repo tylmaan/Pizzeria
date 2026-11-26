@@ -5,6 +5,7 @@ using Pizzeria.Domain.Drivers;
 using Pizzeria.Domain.Menu;
 using Pizzeria.Domain.Orders;
 using Pizzeria.Domain.Payments;
+using Pizzeria.Domain.Printing;
 using Pizzeria.Domain.Tenancy;
 using Location = Pizzeria.Domain.Tenancy.Location;
 
@@ -35,6 +36,10 @@ public interface IAppDbContext
     DbSet<DriverPosition> DriverPositions { get; }
 
     DbSet<Payment> Payments { get; }
+
+    DbSet<PrintAgent> PrintAgents { get; }
+
+    DbSet<PrintJob> PrintJobs { get; }
 
     DatabaseFacade Database { get; }
 
