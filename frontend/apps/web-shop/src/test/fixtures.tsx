@@ -37,6 +37,7 @@ export const shop: ShopDto = {
   companyName: 'Demo Pizza',
   locations: [{ id: 'l-1', name: 'Centrum', address: { street: 'ul. Lipowa 1', postalCode: '15-001', city: 'Białystok' } }],
   menu,
+  onlinePayments: true,
 };
 
 export const json = (body: unknown, status = 200) => () => Response.json(body, { status });

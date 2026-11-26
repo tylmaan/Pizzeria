@@ -928,6 +928,117 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/payments/webhooks/{provider}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    provider: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/shop/orders/{token}/payment": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    token: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["PaymentRedirectDto"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/payments/fake/{providerPaymentId}/complete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    providerPaymentId: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["FakePaymentCompletion"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/shop": {
         parameters: {
             query?: never;
@@ -1693,6 +1804,9 @@ export interface components {
         };
         /** @enum {unknown} */
         DriverShiftStatus: "Open" | "Closed" | "Settled";
+        FakePaymentCompletion: {
+            succeeded: boolean;
+        };
         /** @enum {unknown} */
         FulfillmentType: "Delivery" | "Pickup";
         GeoPointDto: {
@@ -1828,6 +1942,9 @@ export interface components {
         };
         /** @enum {unknown} */
         PaymentMethod: "Cash" | "CardOnDelivery" | "Online";
+        PaymentRedirectDto: {
+            redirectUrl: string;
+        };
         /** @enum {unknown} */
         PaymentStatus: "Unpaid" | "PendingOnline" | "Paid" | "Refunded";
         PlacedOrderDto: {
@@ -1838,6 +1955,7 @@ export interface components {
             trackingToken: string;
             /** Format: double */
             total: number;
+            paymentRedirectUrl: null | string;
         };
         PlaceOrderRequest: {
             fulfillment: components["schemas"]["FulfillmentType"];
@@ -1930,6 +2048,7 @@ export interface components {
             companyName: string;
             locations: components["schemas"]["ShopLocationDto"][];
             menu: components["schemas"]["MenuDto"];
+            onlinePayments: boolean;
         };
         ShopLocationDto: {
             /** Format: uuid */

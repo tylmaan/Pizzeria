@@ -66,6 +66,38 @@ export function usePlaceOrder() {
   return useMutation({ mutationFn: (body: PlaceOrderRequest) => unwrap(api.POST('/api/shop/orders', { body })) });
 }
 
+export function useRetryPayment(token: string) {
+  const api = useApi();
+  return useMutation({
+    mutationFn: () => unwrap(api.POST('/api/shop/orders/{token}/payment', { params: { path: { token } } })),
+  });
+}
+
+/** Development fake operator: completes a payment as the provider would (signed webhook on the server). */
+export function useCompleteFakePayment(providerPaymentId: string) {
+  const api = useApi();
+  return useMutation({
+    mutationFn: async (succeeded: boolean) => {
+      const { response } = await api.POST('/api/payments/fake/{providerPaymentId}/complete', {
+        params: { path: { providerPaymentId } },
+        body: { succeeded },
+      });
+      if (!response.ok) {
+        throw new Error(`Fake payment failed: ${response.status}`);
+      }
+    },
+  });
+}
+
+/** Payment pages of real operators are external; the fake one is a page of this shop. */
+export function goToPayment(url: string, navigate: (path: string) => unknown): void {
+  if (url.startsWith('/')) {
+    void navigate(url);
+  } else {
+    window.location.assign(url);
+  }
+}
+
 const finished = new Set(['Delivered', 'PickedUp', 'Cancelled']);
 
 /** Live order status: pushed by SignalR, with polling as a fallback while the live connection is down. */

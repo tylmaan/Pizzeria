@@ -33,6 +33,9 @@ export function OrderCard({ order, now, canCancel }: { order: StaffOrderDto; now
           {order.fulfillment === 'Delivery' ? t('orders.delivery') : t('orders.pickup')}
         </span>
         {order.source !== 'Online' && <span className="rounded-full bg-neutral-200 px-2 py-0.5">{t('orders.phone')}</span>}
+        {order.paymentStatus === 'PendingOnline' && (
+          <span className="rounded-full bg-amber-200 px-2 py-0.5 text-amber-950">{t('orders.awaitingPayment')}</span>
+        )}
         <span className="rounded-full bg-orange-100 px-2 py-0.5 text-orange-900">{t(`staffOrderStatus.${order.status}`)}</span>
       </div>
       <p className="text-lg">

@@ -1,9 +1,9 @@
 import { errorCodeOf, type OrderStatus } from '@pizzeria/api-client';
 import { formatMoney, useCodeTranslations, useTranslation } from '@pizzeria/i18n';
-import { Alert } from '@pizzeria/ui';
+import { Alert, Button } from '@pizzeria/ui';
 import { lazy, Suspense } from 'react';
-import { useParams } from 'react-router';
-import { useDriverPosition, useTracking } from '../app/services';
+import { useNavigate, useParams } from 'react-router';
+import { goToPayment, useDriverPosition, useRetryPayment, useTracking } from '../app/services';
 
 const DriverMap = lazy(() => import('./DriverMap'));
 
@@ -17,6 +17,8 @@ export function TrackingPage() {
   const tracking = useTracking(token);
   const onTheWay = tracking.data?.status === 'InDelivery';
   const driver = useDriverPosition(token, onTheWay);
+  const navigate = useNavigate();
+  const retry = useRetryPayment(token);
 
   if (tracking.isError) {
     return <Alert>{codes.error(errorCodeOf(tracking.error))}</Alert>;
@@ -38,6 +40,15 @@ export function TrackingPage() {
         <p className="text-lg text-neutral-700">{t('shop.orderFrom', { location: order.locationName })}</p>
         <p className="text-sm text-neutral-600">{t('shop.trackingHint')}</p>
       </div>
+
+      {order.paymentStatus === 'PendingOnline' && order.status !== 'Cancelled' && (
+        <div role="alert" className="flex flex-col gap-3 rounded-xl border-2 border-amber-500 bg-amber-50 p-4">
+          <p className="text-lg font-semibold">{t('shop.awaitingPayment')}</p>
+          <Button disabled={retry.isPending} onClick={() => retry.mutate(undefined, { onSuccess: (r) => goToPayment(r.redirectUrl, navigate) })}>
+            {t('shop.payNow')}
+          </Button>
+        </div>
+      )}
 
       {order.status === 'Cancelled' ? (
         <Alert>{t('shop.cancelled', { reason: order.cancellationReason ?? '' })}</Alert>

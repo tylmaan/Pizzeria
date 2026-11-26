@@ -339,7 +339,8 @@ Cel: jedno zamówienie przechodzi całą drogę od klienta do dostarczenia.
 
 ### Etap 2
 - ✅ GPS na żywo (lokal + klient), rozliczenie zmiany kierowcy. Pozycja idzie REST-em (`POST /api/driver/position`) tylko przy otwartej zmianie, a powiadomienie `DriverMoved` przez SignalR. Ślad kasuje `DriverPositionRetention` (Api/Background) po `DriverTracking:RetentionDays` (domyślnie 30). Mapa kierowców w panelu jest zwijana i odpytuje API co 15 s.
-- Następne: płatności online (fake provider), konta klientów, agent lokalny + drukarki, raporty
+- ✅ Płatności online (na razie fake provider). Zamówienie online startuje jako `PendingOnline`, a `Accept` jest zablokowane (`order.awaiting_payment`) do potwierdzenia płatności. `Payment` to jedna próba płatności (klient może ponowić z linku śledzenia). Webhook `POST /api/payments/webhooks/{provider}` sprawdza podpis i szuka płatności poza filtrem tenanta (webhook nie ma tenanta), po czym działa już w firmie tej płatności. Jest idempotentny: zakończona próba się nie zmienia, a opłacone zamówienie zostaje opłacone. Płatności online są wyłączone, dopóki nie ustawi się `Payments:Provider` (w Development i testach `Fake`). Nie ma ich też w zamówieniach telefonicznych. Fake: strona `/pay/fake/{id}` w sklepie wysyła webhook podpisany HMAC (`/api/payments/fake/{id}/complete` istnieje tylko przy providerze Fake). Prawdziwy operator wymaga danych dostępowych per firma (szyfrowanych, np. ASP.NET Data Protection) — do zrobienia razem z wyborem operatora.
+- Następne: konta klientów, agent lokalny + drukarki, raporty
 - Testy frontendu: `pnpm test` uruchamia pakiety po kolei (`--workspace-concurrency=1`), bo równoległe jsdom potrafiło skończyć się brakiem pamięci
 - Płatności online (pierwszy operator), konta klientów
 - Agent lokalny + drukarka bonów, potem drukarka fiskalna (pierwszy model)

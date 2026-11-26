@@ -3,7 +3,7 @@ import { formatMoney, useTranslation } from '@pizzeria/i18n';
 import { Alert, Button, TextField } from '@pizzeria/ui';
 import { useState, type FormEvent, type ReactNode } from 'react';
 import { Navigate, useNavigate } from 'react-router';
-import { useDeliveryCheck, usePlaceOrder, useShop } from '../app/services';
+import { goToPayment, useDeliveryCheck, usePlaceOrder, useShop } from '../app/services';
 import { useCart } from '../cart/cart';
 import { useFormErrors } from '../lib/formErrors';
 import { cartTotal, describeItem } from './CartPage';
@@ -63,7 +63,11 @@ export function CheckoutPage() {
       {
         onSuccess: (order) => {
           cart.clear();
-          void navigate(`/order/${order.trackingToken}`, { replace: true });
+          if (order.paymentRedirectUrl) {
+            goToPayment(order.paymentRedirectUrl, navigate);
+          } else {
+            void navigate(`/order/${order.trackingToken}`, { replace: true });
+          }
         },
       },
     );
@@ -130,7 +134,7 @@ export function CheckoutPage() {
 
       <fieldset className="flex flex-col gap-2">
         <legend className="mb-1 text-lg font-semibold">{t('shop.payment')}</legend>
-        {paymentMethods.map((method) => (
+        {(shop.onlinePayments ? [...paymentMethods, 'Online' as const] : paymentMethods).map((method) => (
           <Choice key={method} name="payment" checked={payment === method} onChange={() => setPayment(method)}>
             {t(`paymentMethod.${method}`)}
           </Choice>
@@ -150,7 +154,9 @@ export function CheckoutPage() {
 
       {placeErrors.general && <Alert>{placeErrors.general}</Alert>}
       <Button type="submit" className="w-full" disabled={place.isPending}>
-        {place.isPending ? t('shop.placing') : t('shop.placeOrder', { total: formatMoney(itemsTotal + deliveryFee) })}
+        {place.isPending
+          ? t('shop.placing')
+          : t(payment === 'Online' ? 'shop.placeOrderOnline' : 'shop.placeOrder', { total: formatMoney(itemsTotal + deliveryFee) })}
       </Button>
     </form>
   );

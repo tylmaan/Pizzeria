@@ -145,7 +145,8 @@
       "not_found": "Nie znaleziono zamówienia.",
       "no_next_status": "To zamówienie czeka na przypisanie kierowcy.",
       "status_change_not_allowed": "Nie możesz wykonać tej zmiany statusu.",
-      "driver_not_found": "Nie znaleziono kierowcy w tym lokalu."
+      "driver_not_found": "Nie znaleziono kierowcy w tym lokalu.",
+      "awaiting_payment": "Zamówienie czeka na potwierdzenie płatności online."
     },
     "shift": {
       "already_open": "Masz już otwartą zmianę.",
@@ -154,6 +155,13 @@
       "discrepancy_comment_required": "Kwota się nie zgadza — dodaj komentarz.",
       "invalid_amount": "Nieprawidłowa kwota.",
       "not_found": "Nie znaleziono zmiany."
+    },
+    "payment": {
+      "not_online_order": "To zamówienie nie jest opłacane online.",
+      "already_paid": "Zamówienie jest już opłacone.",
+      "not_found": "Nie znaleziono płatności.",
+      "provider_not_found": "Nieznany operator płatności.",
+      "invalid_signature": "Nieprawidłowy podpis powiadomienia."
     }
   },
   "validation": {
@@ -301,7 +309,10 @@
     "trackingHint": "Zachowaj ten link, aby śledzić zamówienie.",
     "cancelled": "Zamówienie anulowane: {{reason}}",
     "notFound": "Nie znaleziono zamówienia.",
-    "driverOnMap": "Twój kierowca jest w drodze"
+    "driverOnMap": "Twój kierowca jest w drodze",
+    "placeOrderOnline": "Zamawiam i płacę online · {{total}}",
+    "awaitingPayment": "Płatność online nie została jeszcze potwierdzona.",
+    "payNow": "Zapłać teraz"
   },
   "orderStatus": {
     "New": "Przyjęte do realizacji",
@@ -317,7 +328,7 @@
   "paymentMethod": {
     "Cash": "Gotówka",
     "CardOnDelivery": "Karta przy odbiorze",
-    "Online": "Online"
+    "Online": "Płatność online"
   },
   "orders": {
     "title": "Zamówienia",
@@ -355,7 +366,8 @@
     "confirmCancel": "Anuluj zamówienie",
     "back": "Wróć",
     "live": "Na żywo",
-    "offline": "Brak połączenia na żywo — odświeżam co 30 s"
+    "offline": "Brak połączenia na żywo — odświeżam co 30 s",
+    "awaitingPayment": "Czeka na płatność online"
   },
   "phoneOrder": {
     "title": "Nowe zamówienie telefoniczne",
@@ -446,5 +458,12 @@
     "title": "Mapa kierowców",
     "none": "Żaden kierowca na zmianie nie wysyła teraz pozycji.",
     "driverAge": "{{name}} · {{seconds}} s temu"
+  },
+  "fakePay": {
+    "title": "Testowa płatność",
+    "hint": "To symulacja operatora płatności (tylko środowisko deweloperskie). Żadne pieniądze nie są pobierane.",
+    "amount": "Kwota: {{amount}}",
+    "pay": "Zapłać",
+    "reject": "Odrzuć płatność"
   }
 }
