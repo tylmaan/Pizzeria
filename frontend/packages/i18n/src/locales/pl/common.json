@@ -11,7 +11,8 @@
     "staff": "Pracownicy",
     "mainMenu": "Menu główne",
     "menu": "Menu",
-    "shifts": "Rozliczenia"
+    "shifts": "Rozliczenia",
+    "reports": "Raporty"
   },
   "placeholder": {
     "comingSoon": "Ta sekcja jest w budowie.",
@@ -162,6 +163,9 @@
       "not_found": "Nie znaleziono płatności.",
       "provider_not_found": "Nieznany operator płatności.",
       "invalid_signature": "Nieprawidłowy podpis powiadomienia."
+    },
+    "report": {
+      "invalid_range": "Nieprawidłowy zakres dat (maksymalnie rok)."
     }
   },
   "validation": {
@@ -465,5 +469,35 @@
     "amount": "Kwota: {{amount}}",
     "pay": "Zapłać",
     "reject": "Odrzuć płatność"
+  },
+  "reports": {
+    "title": "Raporty",
+    "location": "Lokal",
+    "wholeCompany": "Cała firma",
+    "from": "Od",
+    "to": "Do",
+    "today": "Dziś",
+    "last7": "7 dni",
+    "last30": "30 dni",
+    "completed": "Zrealizowane zamówienia",
+    "cancelled": "Anulowane",
+    "revenue": "Utarg",
+    "average": "Średnia wartość",
+    "byDay": "Utarg dzienny",
+    "day": "Dzień",
+    "total": "Razem",
+    "bestSellers": "Najlepiej sprzedające się",
+    "product": "Pozycja",
+    "quantity": "Sztuk",
+    "times": "Średnie czasy (min)",
+    "toAccept": "Złożenie → przyjęcie",
+    "acceptToReady": "Przyjęcie → gotowe",
+    "delivery": "Wyjazd → dostarczenie",
+    "placedToCompleted": "Złożenie → wydanie",
+    "drivers": "Kierowcy",
+    "driver": "Kierowca",
+    "deliveries": "Kursy",
+    "avgDelivery": "Śr. czas dostawy (min)",
+    "noData": "Brak danych w tym okresie."
   }
 }

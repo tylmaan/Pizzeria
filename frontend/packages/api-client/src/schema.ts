@@ -1039,6 +1039,45 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/reports": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query: {
+                    locationId?: string;
+                    from: string;
+                    to: string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ReportDto"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/shop": {
         parameters: {
             query?: never;
@@ -1661,6 +1700,13 @@ export interface components {
             /** Format: uuid */
             driverId: string;
         };
+        BestSellerDto: {
+            productName: string;
+            /** Format: int32 */
+            quantity: number;
+            /** Format: double */
+            revenue: number;
+        };
         CancelOrderRequest: {
             reason: string;
         };
@@ -1766,6 +1812,17 @@ export interface components {
             longitude: number;
             /** Format: date-time */
             recordedAt: string;
+        };
+        DriverResultDto: {
+            /** Format: uuid */
+            driverId: string;
+            driverName: null | string;
+            /** Format: int32 */
+            deliveries: number;
+            /** Format: double */
+            averageDeliveryMinutes: null | number;
+            /** Format: double */
+            total: number;
         };
         DriverShiftDto: {
             /** Format: uuid */
@@ -1919,6 +1976,16 @@ export interface components {
             /** Format: date-time */
             at: string;
         };
+        OrderTimesDto: {
+            /** Format: double */
+            toAccept: null | number;
+            /** Format: double */
+            acceptToReady: null | number;
+            /** Format: double */
+            delivery: null | number;
+            /** Format: double */
+            placedToCompleted: null | number;
+        };
         OrderTrackingDto: {
             /** Format: int32 */
             number: number;
@@ -1996,6 +2063,19 @@ export interface components {
         RefreshRequest: {
             refreshToken: string;
         };
+        ReportDto: {
+            /** Format: uuid */
+            locationId: null | string;
+            /** Format: date */
+            from: string;
+            /** Format: date */
+            to: string;
+            summary: components["schemas"]["ReportSummaryDto"];
+            revenue: components["schemas"]["RevenueRowDto"][];
+            bestSellers: components["schemas"]["BestSellerDto"][];
+            times: components["schemas"]["OrderTimesDto"];
+            drivers: components["schemas"]["DriverResultDto"][];
+        };
         ReportPositionRequest: {
             /** Format: double */
             latitude: number;
@@ -2003,6 +2083,27 @@ export interface components {
             longitude: number;
             /** Format: double */
             accuracyMeters: null | number;
+        };
+        ReportSummaryDto: {
+            /** Format: int32 */
+            completedOrders: number;
+            /** Format: int32 */
+            cancelledOrders: number;
+            /** Format: double */
+            revenue: number;
+            /** Format: double */
+            averageOrderValue: number;
+        };
+        RevenueRowDto: {
+            /** Format: date */
+            day: string;
+            paymentMethod: string;
+            /** Format: int32 */
+            orders: number;
+            /** Format: double */
+            total: number;
+            /** Format: double */
+            deliveryFees: number;
         };
         SaveCategoryRequest: {
             name: string;
