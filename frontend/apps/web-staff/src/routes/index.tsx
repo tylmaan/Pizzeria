@@ -6,6 +6,8 @@ import { EditLocationPage, NewLocationPage } from '../company/LocationFormPage';
 import { LocationsPage } from '../company/LocationsPage';
 import { NewStaffPage } from '../company/NewStaffPage';
 import { StaffPage } from '../company/StaffPage';
+import { DriverPage } from '../driver/DriverPage';
+import { KitchenPage } from '../kitchen/KitchenPage';
 import { EditCategoryPage, NewCategoryPage } from '../menu/CategoryFormPage';
 import { MenuPage } from '../menu/MenuPage';
 import { EditModifierGroupPage, NewModifierGroupPage } from '../menu/ModifierGroupFormPage';
@@ -16,7 +18,6 @@ import { ZoneFormPage } from '../zones/ZoneFormPage';
 import { ZonesPage } from '../zones/ZonesPage';
 import { navItems } from './navigation';
 import { Layout, StartPage } from './Layout';
-import { Placeholder } from './Placeholder';
 
 const rolesFor = (to: string) => navItems.find((item) => item.to === to)?.roles ?? [];
 
@@ -43,7 +44,7 @@ export const routes: RouteObject[] = [
         path: 'kitchen',
         element: (
           <RequireRole roles={rolesFor('/kitchen')}>
-            <Placeholder titleKey="nav.kitchen" />
+            <KitchenPage />
           </RequireRole>
         ),
       },
@@ -51,7 +52,7 @@ export const routes: RouteObject[] = [
         path: 'driver',
         element: (
           <RequireRole roles={rolesFor('/driver')}>
-            <Placeholder titleKey="nav.driver" />
+            <DriverPage />
           </RequireRole>
         ),
       },

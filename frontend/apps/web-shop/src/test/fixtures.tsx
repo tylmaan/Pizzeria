@@ -1,5 +1,5 @@
 import type { MenuDto, ShopDto } from '@pizzeria/api-client';
-import { render } from '@testing-library/react';
+import { act, render } from '@testing-library/react';
 import { createMemoryRouter, RouterProvider } from 'react-router';
 import { createShopServices, ShopServicesProvider } from '../app/services';
 import type { CartItem, CartStore } from '../cart/cart';
@@ -54,9 +54,10 @@ export function renderShop({ path = '/', routes: fake = {}, cart = [] }: { path?
 
   let saved = cart;
   const cartStore: CartStore = { load: () => saved, save: (items) => (saved = items) };
+  const tracking: { push: () => void } = { push: () => undefined };
   const router = createMemoryRouter(routes, { initialEntries: [path] });
   render(
-    <ShopServicesProvider services={createShopServices({ fetch, cartStore })}>
+    <ShopServicesProvider services={createShopServices({ fetch, cartStore, trackingFeed: (_token, onChange) => { tracking.push = onChange; return () => undefined; } })}>
       <RouterProvider router={router} />
     </ShopServicesProvider>,
   );
@@ -64,6 +65,8 @@ export function renderShop({ path = '/', routes: fake = {}, cart = [] }: { path?
   return {
     router,
     cart: () => saved,
+    /** Simulates a live "order changed" push. */
+    pushTracking: () => act(() => tracking.push()),
     bodiesOf: (route: string) =>
       Promise.all(requests.filter((r) => `${r.method} ${new URL(r.url).pathname}` === route).map((r) => r.json() as Promise<unknown>)),
   };

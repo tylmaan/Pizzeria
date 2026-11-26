@@ -23,7 +23,7 @@ export function OrdersPage() {
   const user = useCurrentUser();
   const [locationId, setLocationId] = useCurrentLocationId();
   const locations = useLocations();
-  const live = useOrdersLive(locationId, { alertOnNew: true });
+  const live = useOrdersLive(locationId, { alertOn: 'New' });
   const orders = useOrders(locationId, 'Active', live);
   const now = useNow();
   const canCancel = hasAnyRole(user, [Roles.CompanyAdmin, Roles.LocationManager, Roles.Staff]);

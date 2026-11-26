@@ -374,5 +374,25 @@
     "Delivered": "Dostarczone",
     "PickedUp": "Odebrane",
     "Cancelled": "Anulowane"
+  },
+  "kitchen": {
+    "title": "Kuchnia",
+    "empty": "Brak zamówień do przygotowania.",
+    "start": "Start",
+    "ready": "Gotowe",
+    "since": "{{minutes}} min"
+  },
+  "driver": {
+    "title": "Moje kursy",
+    "empty": "Nie masz przypisanych kursów.",
+    "keepOpen": "Trzymaj aplikację otwartą — wtedy lokal widzi Twoje kursy na bieżąco.",
+    "call": "Zadzwoń",
+    "navigate": "Nawiguj",
+    "collect": "Do pobrania: {{amount}} ({{method}})",
+    "paidOnline": "Opłacone — nic nie pobierasz",
+    "pickedUp": "Odebrałem z lokalu",
+    "delivered": "Dostarczone",
+    "waiting": "Czeka w lokalu",
+    "onTheWay": "W drodze"
   }
 }

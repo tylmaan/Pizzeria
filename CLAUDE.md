@@ -215,6 +215,13 @@ Huby i grupy:
 
 Zasada: SignalR tylko **powiadamia** o zmianie, źródłem prawdy jest REST API. Po reconnect klient pobiera aktualny stan przez API (TanStack Query invalidation), nie polega na tym, że nie zgubił komunikatów.
 
+**Jak to jest zrobione:**
+- Na razie jeden hub, `OrdersHub` (`/hubs/orders`), z grupami `location:{id}` (`JoinLocation`, sprawdza dostęp do lokalu), `order:{id}` (`TrackOrder(token)`, anonimowo, tenant z subdomeny) i `driver:{userId}` (automatycznie dla kierowcy). Komunikat `OrderChanged { orderId, locationId, number, status }`.
+- Wywołania huba nie przechodzą przez middleware HTTP, więc `HubTenantFilter` ustawia `TenantContext` przy połączeniu i przy każdym wywołaniu (`TenantResolver`, wspólny z middleware). Token bearer dla WebSocketów idzie w `access_token` w query (tylko dla ścieżki huba).
+- `SignalROrderNotifier` (`IOrderNotifier`) wysyła powiadomienie po złożeniu zamówienia i po każdej zmianie statusu (`OrderWorkflowService`).
+- **Klienci:** w `web-staff` jest `OrdersFeed` (wstrzykiwany przez `createAppServices`, w testach podmieniany). Panel, kuchnia i kierowca robią invalidację zapytań. Bez połączenia lista odpytuje API co 30 s, a ekran pokazuje „Brak połączenia na żywo”. W `web-shop` jest `TrackingFeed` (anonimowo), z odpytywaniem co 15 s jako zapasem. W dev Vite proxuje `/hubs` z `ws: true`.
+- `DriversHub` (GPS) i `AgentHub` (drukarki) powstaną w etapie 2.
+
 ## Konwencje
 
 ### Ogólne
@@ -323,10 +330,12 @@ Cel: jedno zamówienie przechodzi całą drogę od klienta do dostarczenia.
 3. ✅ Menu firmy: kategorie, produkty, rozmiary, modyfikatory, pół na pół (prosty edytor w panelu firmy)
 4. ✅ Strefy dostaw lokalu + geokodowanie (fake/prosty dostawca)
 5. ✅ Sklep klienta: menu → koszyk → adres → zamówienie jako gość, płatność przy odbiorze, strona śledzenia (na razie odświeża status co 15 s; SignalR razem z kolejką zamówień w kroku 6)
-6. Panel lokalu: kolejka zamówień na żywo, zamówienie telefoniczne, zmiany statusów
-7. Ekran kuchni
-8. Aplikacja kierowcy: lista kursów, statusy, nawigacja
-9. Przydzielanie kierowcy w panelu
+6. ✅ Panel lokalu: kolejka zamówień na żywo, zamówienie telefoniczne, zmiany statusów
+7. ✅ Ekran kuchni
+8. ✅ Aplikacja kierowcy: lista kursów, statusy, nawigacja
+9. ✅ Przydzielanie kierowcy w panelu
+
+**Etap 1 zrobiony.** Uprawnienia do zmian statusu (`OrderPermissions`): obsługa, kierownik i admin firmy mogą wszystko. Kuchnia: „w przygotowaniu” i „gotowe”. Kierowca: „w drodze” i „dostarczone”, tylko dla swoich zamówień (inne widzi jako 404). Anulowanie wymaga powodu. Kuchnia dzwoni, gdy zamówienie zostanie przyjęte (wtedy trafia do kuchni), panel przy nowym zamówieniu, kierowca przy przypisaniu kursu.
 
 ### Etap 2
 - GPS na żywo (lokal + klient), rozliczenie zmiany kierowcy
@@ -347,6 +356,10 @@ Cel: jedno zamówienie przechodzi całą drogę od klienta do dostarczenia.
 - [ ] Hosting produkcyjny
 - [ ] Dostawca kafelków mapy na produkcję (tile.openstreetmap.org nie jest do ruchu produkcyjnego; np. MapTiler, Stadia, własny serwer)
 - [ ] Kierownik lokalu może zarządzać strefami swojego lokalu przez API, ale w panelu nie ma jeszcze dla niego wejścia (link jest na liście lokali, którą widzi tylko administrator firmy)
+- [ ] Progi kolorów na ekranie kuchni są stałe w kodzie (10 / 20 min od przyjęcia, `KITCHEN_*_MINUTES`). Czy mają być ustawieniem lokalu?
+- [ ] Zamówienie telefoniczne z dostawą trafia do lokalu wynikającego ze strefy adresu (może to być inny lokal niż ten, który odebrał telefon). Czy tak ma zostać?
+- [ ] Godziny otwarcia lokali: nie zaimplementowane, zamówienia są przyjmowane zawsze
+- [ ] Kierowca dołącza do grupy SignalR całego lokalu (widzi numery i statusy wszystkich zamówień lokalu, ale szczegóły tylko swoich przez API)
 - [ ] Obsługiwane modele drukarek fiskalnych i zasady wystawiania paragonów
 - [ ] Czy lokal może chwilowo wyłączać dostępność pozycji z menu (założone: tak)
 - [ ] Reguła ceny pół na pół (założone: cena droższej połówki, konfigurowalne — zrobione: droższa / średnia)

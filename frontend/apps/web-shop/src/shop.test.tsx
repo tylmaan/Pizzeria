@@ -1,4 +1,4 @@
-import { fireEvent, screen } from '@testing-library/react';
+import { fireEvent, screen, waitFor } from '@testing-library/react';
 import { describe, expect, test } from 'vitest';
 import type { CartItem } from './cart/cart';
 import { json, renderShop } from './test/fixtures';
@@ -124,6 +124,22 @@ describe('shop', () => {
     expect(current.closest('li')?.getAttribute('aria-current')).toBe('step');
     expect(screen.getByText(/Margherita/).textContent).toContain('/ Pepperoni');
     expect(screen.getByText('Karta przy odbiorze')).toBeTruthy();
+  });
+
+  test('tracking updates as soon as the restaurant changes the status', async () => {
+    let status = 'New';
+    const tracked = () => Response.json({
+      number: 4, status, fulfillment: 'Pickup', locationName: 'Centrum', placedAt: '2026-11-26T18:00:00Z', items: [],
+      itemsTotal: 27, deliveryFee: 0, total: 27, paymentMethod: 'Cash', paymentStatus: 'Unpaid', deliveryAddress: null,
+      cancellationReason: null, history: [],
+    });
+    const { pushTracking } = renderShop({ path: '/order/t', routes: { 'GET /api/shop/orders/t': tracked } });
+    expect((await screen.findByText('Przyjęte do realizacji')).closest('li')?.getAttribute('aria-current')).toBe('step');
+
+    status = 'Ready';
+    pushTracking();
+
+    await waitFor(() => expect(screen.getByText('Gotowe').closest('li')?.getAttribute('aria-current')).toBe('step'));
   });
 
   test('the cart lets the customer change quantities and remove items', async () => {

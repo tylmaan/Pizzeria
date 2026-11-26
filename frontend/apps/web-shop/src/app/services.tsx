@@ -1,15 +1,19 @@
 import { ApiError, createApiClient, unwrap, type ApiClient, type DeliveryCheckRequest, type PlaceOrderRequest } from '@pizzeria/api-client';
 import { QueryClient, QueryClientProvider, useMutation, useQuery } from '@tanstack/react-query';
-import { createContext, useContext, type ReactNode } from 'react';
+import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
 import { CartProvider, localStorageCartStore, type CartStore } from '../cart/cart';
+import { signalRTrackingFeed, type TrackingFeed } from './trackingFeed';
 
 export interface ShopServices {
   api: ApiClient;
   queryClient: QueryClient;
   cartStore: CartStore;
+  trackingFeed: TrackingFeed;
 }
 
-export function createShopServices(options: { fetch?: (request: Request) => Promise<Response>; cartStore?: CartStore } = {}): ShopServices {
+export function createShopServices(
+  options: { fetch?: (request: Request) => Promise<Response>; cartStore?: CartStore; trackingFeed?: TrackingFeed } = {},
+): ShopServices {
   return {
     // Anonymous: the API recognises the shop by the host name.
     api: createApiClient(options.fetch ? { fetch: options.fetch } : {}),
@@ -21,6 +25,7 @@ export function createShopServices(options: { fetch?: (request: Request) => Prom
       },
     }),
     cartStore: options.cartStore ?? localStorageCartStore(),
+    trackingFeed: options.trackingFeed ?? signalRTrackingFeed,
   };
 }
 
@@ -36,13 +41,15 @@ export function ShopServicesProvider({ services, children }: { services: ShopSer
   );
 }
 
-function useApi(): ApiClient {
+function useServices(): ShopServices {
   const services = useContext(ServicesContext);
   if (services === null) {
     throw new Error('Shop services are missing.');
   }
-  return services.api;
+  return services;
 }
+
+const useApi = (): ApiClient => useServices().api;
 
 export function useShop() {
   const api = useApi();
@@ -61,12 +68,19 @@ export function usePlaceOrder() {
 
 const finished = new Set(['Delivered', 'PickedUp', 'Cancelled']);
 
-/** Polls until the order is finished. (Live push via SignalR comes with the staff order queue.) */
+/** Live order status: pushed by SignalR, with polling as a fallback while the live connection is down. */
 export function useTracking(token: string) {
-  const api = useApi();
+  const { api, trackingFeed, queryClient } = useServices();
+  const [live, setLive] = useState(false);
+
+  useEffect(
+    () => trackingFeed(token, () => void queryClient.invalidateQueries({ queryKey: ['tracking', token] }), setLive),
+    [token, trackingFeed, queryClient],
+  );
+
   return useQuery({
     queryKey: ['tracking', token],
     queryFn: () => unwrap(api.GET('/api/shop/orders/{token}', { params: { path: { token } } })),
-    refetchInterval: (query) => (query.state.data && finished.has(query.state.data.status) ? false : 15_000),
+    refetchInterval: (query) => (live || (query.state.data && finished.has(query.state.data.status)) ? false : 15_000),
   });
 }

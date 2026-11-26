@@ -19,8 +19,8 @@ export function useOrders(locationId: string, scope: OrderListScope = 'Active', 
   });
 }
 
-/** Keeps the location's order lists fresh via SignalR and alerts on new orders. */
-export function useOrdersLive(locationId: string, { alertOnNew }: { alertOnNew: boolean }): FeedState {
+/** Keeps the location's order lists fresh via SignalR and alerts when an order reaches the given status. */
+export function useOrdersLive(locationId: string, { alertOn }: { alertOn: string | null }): FeedState {
   const { ordersFeed, queryClient, newOrderAlert } = useServices();
   const [state, setState] = useState<FeedState>('disconnected');
 
@@ -31,14 +31,14 @@ export function useOrdersLive(locationId: string, { alertOnNew }: { alertOnNew: 
     return ordersFeed(
       locationId,
       (change) => {
-        if (alertOnNew && change?.status === 'New') {
+        if (alertOn !== null && change?.status === alertOn) {
           newOrderAlert();
         }
         void queryClient.invalidateQueries({ queryKey: ordersKey(locationId) });
       },
       setState,
     );
-  }, [locationId, alertOnNew, ordersFeed, queryClient, newOrderAlert]);
+  }, [locationId, alertOn, ordersFeed, queryClient, newOrderAlert]);
 
   return state;
 }
