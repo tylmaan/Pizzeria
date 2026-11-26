@@ -1,3 +1,4 @@
+using Pizzeria.Application.Drivers;
 using Pizzeria.Application.Orders;
 using Pizzeria.Domain.Orders;
 
@@ -23,6 +24,9 @@ public static class ShopEndpoints
 
         shop.MapGet("/orders/{token}", (string token, OrderTrackingService service, CancellationToken ct) =>
             service.GetAsync(token, ct));
+
+        shop.MapGet("/orders/{token}/driver", (string token, DriverTrackingService service, CancellationToken ct) =>
+            service.GetForOrderAsync(token, ct));
 
         return routes;
     }

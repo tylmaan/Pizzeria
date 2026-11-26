@@ -31,6 +31,8 @@ public interface IAppDbContext
 
     DbSet<DriverShift> DriverShifts { get; }
 
+    DbSet<DriverPosition> DriverPositions { get; }
+
     DatabaseFacade Database { get; }
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);

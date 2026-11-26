@@ -2,8 +2,10 @@ using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Pizzeria.Api.Tenancy;
 using Pizzeria.Application.Abstractions;
+using Pizzeria.Application.Drivers;
 using Pizzeria.Application.Orders;
 using Pizzeria.Application.Tenancy;
+using Pizzeria.Domain.Drivers;
 using Pizzeria.Domain.Identity;
 using Pizzeria.Domain.Orders;
 
@@ -103,5 +105,21 @@ public sealed class SignalROrderNotifier(IHubContext<OrdersHub> hub) : IOrderNot
             OrdersHub.OrderChanged,
             new { orderId = order.Id, locationId = order.LocationId, number = order.Number, status = order.Status.ToString() },
             ct);
+    }
+}
+
+/// <summary>"DriverMoved" to the location's screens and to customers tracking an order this driver is delivering.</summary>
+public sealed class SignalRDriverPositionNotifier(IHubContext<OrdersHub> hub) : IDriverPositionNotifier
+{
+    public const string DriverMoved = nameof(DriverMoved);
+
+    public Task PositionChangedAsync(DriverPosition position, IReadOnlyList<Guid> ordersOnTheWay, CancellationToken ct)
+    {
+        ArgumentNullException.ThrowIfNull(position);
+        ArgumentNullException.ThrowIfNull(ordersOnTheWay);
+
+        var message = new { driverId = position.DriverId, latitude = position.Position.Latitude, longitude = position.Position.Longitude, recordedAt = position.RecordedAt };
+        return hub.Clients.Groups([OrdersHub.LocationGroup(position.LocationId), .. ordersOnTheWay.Select(OrdersHub.OrderGroup)])
+            .SendAsync(DriverMoved, message, ct);
     }
 }

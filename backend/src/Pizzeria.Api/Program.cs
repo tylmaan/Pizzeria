@@ -6,11 +6,13 @@ using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.SignalR;
 using Pizzeria.Api.Auth;
+using Pizzeria.Api.Background;
 using Pizzeria.Api.Endpoints;
 using Pizzeria.Api.Errors;
 using Pizzeria.Api.Realtime;
 using Pizzeria.Api.Tenancy;
 using Pizzeria.Application;
+using Pizzeria.Application.Drivers;
 using Pizzeria.Application.Orders;
 using Pizzeria.Infrastructure;
 using Pizzeria.Infrastructure.Persistence;
@@ -53,6 +55,11 @@ builder.Services.AddScoped<TenantResolver>();
 builder.Services.AddSignalR(options => options.AddFilter<HubTenantFilter>());
 // Replaces the no-op notifier registered by AddApplication.
 builder.Services.AddSingleton<IOrderNotifier, SignalROrderNotifier>();
+builder.Services.AddSingleton<IDriverPositionNotifier, SignalRDriverPositionNotifier>();
+
+builder.Services.Configure<DriverTrackingOptions>(builder.Configuration.GetSection(DriverTrackingOptions.SectionName));
+builder.Services.AddSingleton<DriverPositionRetention>();
+builder.Services.AddHostedService(sp => sp.GetRequiredService<DriverPositionRetention>());
 
 builder.Services
     .AddAuthentication(IdentityConstants.BearerScheme)

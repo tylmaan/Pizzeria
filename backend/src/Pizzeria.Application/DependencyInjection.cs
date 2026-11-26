@@ -25,6 +25,8 @@ public static class DependencyInjection
         services.AddScoped<CompanyService>();
         services.AddScoped<DeliveryZoneService>();
         services.AddScoped<DriverShiftService>();
+        services.AddScoped<DriverTrackingService>();
+        services.AddSingleton<IDriverPositionNotifier, NullDriverPositionNotifier>();
         services.AddScoped<DeliveryResolver>();
         services.AddScoped<DeliveryCheckService>();
         services.AddScoped<LocationService>();

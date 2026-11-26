@@ -219,6 +219,60 @@ namespace Pizzeria.Infrastructure.Persistence.Migrations
                     b.ToTable("delivery_zones", (string)null);
                 });
 
+            modelBuilder.Entity("Pizzeria.Domain.Drivers.DriverPosition", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<double?>("AccuracyMeters")
+                        .HasColumnType("double precision")
+                        .HasColumnName("accuracy_meters");
+
+                    b.Property<Guid>("CompanyId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("company_id");
+
+                    b.Property<Guid>("DriverId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("driver_id");
+
+                    b.Property<Guid>("LocationId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("location_id");
+
+                    b.Property<Point>("Point")
+                        .IsRequired()
+                        .HasColumnType("geometry(Point, 4326)")
+                        .HasColumnName("point");
+
+                    b.Property<DateTimeOffset>("RecordedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("recorded_at");
+
+                    b.Property<Guid>("ShiftId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("shift_id");
+
+                    b.HasKey("Id")
+                        .HasName("pk_driver_positions");
+
+                    b.HasIndex("RecordedAt")
+                        .HasDatabaseName("ix_driver_positions_recorded_at");
+
+                    b.HasIndex("ShiftId")
+                        .HasDatabaseName("ix_driver_positions_shift_id");
+
+                    b.HasIndex("DriverId", "RecordedAt")
+                        .HasDatabaseName("ix_driver_positions_driver_id_recorded_at");
+
+                    b.HasIndex("LocationId", "RecordedAt")
+                        .HasDatabaseName("ix_driver_positions_location_id_recorded_at");
+
+                    b.ToTable("driver_positions", (string)null);
+                });
+
             modelBuilder.Entity("Pizzeria.Domain.Drivers.DriverShift", b =>
                 {
                     b.Property<Guid>("Id")
@@ -896,6 +950,16 @@ namespace Pizzeria.Infrastructure.Persistence.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
                         .HasConstraintName("fk_delivery_zones_locations_location_id");
+                });
+
+            modelBuilder.Entity("Pizzeria.Domain.Drivers.DriverPosition", b =>
+                {
+                    b.HasOne("Pizzeria.Domain.Drivers.DriverShift", null)
+                        .WithMany()
+                        .HasForeignKey("ShiftId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_driver_positions_driver_shifts_shift_id");
                 });
 
             modelBuilder.Entity("Pizzeria.Domain.Drivers.DriverShift", b =>

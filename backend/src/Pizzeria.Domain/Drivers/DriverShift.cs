@@ -23,6 +23,7 @@ public static class DriverShiftErrors
     public const string NotClosed = "shift.not_closed";
     public const string CommentRequired = "shift.discrepancy_comment_required";
     public const string InvalidAmount = "shift.invalid_amount";
+    public const string InvalidPosition = "shift.invalid_position";
 }
 
 /// <summary>A delivered order counted into a shift.</summary>

@@ -38,6 +38,8 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options, ITenant
 
     public DbSet<DriverShift> DriverShifts => Set<DriverShift>();
 
+    public DbSet<DriverPosition> DriverPositions => Set<DriverPosition>();
+
     public DbSet<UserLocation> UserLocations => Set<UserLocation>();
 
     // Evaluated per query: EF parameterizes members of the context instance used in query filters.
