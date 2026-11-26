@@ -1,11 +1,18 @@
-import type { MenuDto, ModifierGroupDto, ProductDto } from '@pizzeria/api-client';
+import {
+  allowedGroups,
+  previewUnitPrice,
+  priceAt,
+  selectionIsComplete,
+  type MenuDto,
+  type ModifierGroupDto,
+  type ProductDto,
+} from '@pizzeria/api-client';
 import { formatMoney, useTranslation } from '@pizzeria/i18n';
 import { Button, Checkbox, SelectField } from '@pizzeria/ui';
 import { useState } from 'react';
 import { Link, Navigate, useNavigate, useParams } from 'react-router';
 import { useShop } from '../app/services';
 import { useCart } from '../cart/cart';
-import { allowedGroups, previewUnitPrice, priceAt, selectionIsComplete } from '../menu/pricing';
 
 export function ProductPage() {
   const { productId = '' } = useParams();

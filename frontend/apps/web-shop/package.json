@@ -10,6 +10,7 @@
     "test": "vitest run"
   },
   "dependencies": {
+    "@microsoft/signalr": "^11.0.0",
     "@pizzeria/api-client": "workspace:*",
     "@pizzeria/i18n": "workspace:*",
     "@pizzeria/ui": "workspace:*",

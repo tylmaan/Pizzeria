@@ -1,7 +1,7 @@
+import { lowestPrice } from '@pizzeria/api-client';
 import { formatMoney, useTranslation } from '@pizzeria/i18n';
 import { Link } from 'react-router';
 import { useShop } from '../app/services';
-import { lowestPrice } from '../menu/pricing';
 
 export function MenuPage() {
   const { t } = useTranslation();

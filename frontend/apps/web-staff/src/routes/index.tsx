@@ -10,6 +10,8 @@ import { EditCategoryPage, NewCategoryPage } from '../menu/CategoryFormPage';
 import { MenuPage } from '../menu/MenuPage';
 import { EditModifierGroupPage, NewModifierGroupPage } from '../menu/ModifierGroupFormPage';
 import { EditProductPage, NewProductPage } from '../menu/ProductFormPage';
+import { OrdersPage } from '../orders/OrdersPage';
+import { PhoneOrderPage } from '../orders/PhoneOrderPage';
 import { ZoneFormPage } from '../zones/ZoneFormPage';
 import { ZonesPage } from '../zones/ZonesPage';
 import { navItems } from './navigation';
@@ -31,11 +33,11 @@ export const routes: RouteObject[] = [
       { index: true, element: <StartPage /> },
       {
         path: 'orders',
-        element: (
-          <RequireRole roles={rolesFor('/orders')}>
-            <Placeholder titleKey="nav.orders" />
-          </RequireRole>
-        ),
+        element: <RequireRole roles={rolesFor('/orders')} />,
+        children: [
+          { index: true, element: <OrdersPage /> },
+          { path: 'new', element: <PhoneOrderPage /> },
+        ],
       },
       {
         path: 'kitchen',

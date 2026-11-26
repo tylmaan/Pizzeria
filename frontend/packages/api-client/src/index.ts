@@ -33,6 +33,9 @@ export type PaymentMethod = Schemas['PaymentMethod'];
 export type PlacedOrderDto = Schemas['PlacedOrderDto'];
 export type PlaceOrderRequest = Schemas['PlaceOrderRequest'];
 export type ShopDto = Schemas['ShopDto'];
+export type StaffOrderDto = Schemas['StaffOrderDto'];
+export type OrderListScope = Schemas['OrderListScope'];
+export type DriverDto = Schemas['DriverDto'];
 export type MeResponse = Schemas['MeResponse'];
 export type UpdateLocationRequest = Schemas['UpdateLocationRequest'];
 export type UserDto = Schemas['UserDto'];
@@ -40,4 +43,12 @@ export type UserDto = Schemas['UserDto'];
 export { AuthSession, localStorageTokenStore, type AuthSessionOptions, type RefreshTokenStore } from './auth';
 export { createApiClient, unwrap, type ApiClient, type ApiClientOptions } from './client';
 export { ApiError, errorCodeOf, NETWORK_ERROR_CODE, UNEXPECTED_ERROR_CODE, type ProblemDetails } from './errors';
+export {
+  allowedGroups,
+  lowestPrice,
+  previewUnitPrice,
+  priceAt,
+  selectionIsComplete,
+  type ItemChoice,
+} from './menuPreview';
 export { Roles, type Role } from './roles';

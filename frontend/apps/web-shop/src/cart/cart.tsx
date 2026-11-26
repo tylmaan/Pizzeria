@@ -1,5 +1,5 @@
+import type { ItemChoice } from '@pizzeria/api-client';
 import { createContext, useContext, useEffect, useReducer, type ReactNode } from 'react';
-import type { ItemChoice } from '../menu/pricing';
 
 export type CartItem = ItemChoice & { key: string; quantity: number };
 

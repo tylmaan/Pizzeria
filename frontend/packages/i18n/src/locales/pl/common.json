@@ -141,7 +141,10 @@
       "cancellation_reason_required": "Podaj powód anulowania.",
       "invalid_customer": "Podaj imię i telefon.",
       "payment_method_not_available": "Ta forma płatności nie jest jeszcze dostępna.",
-      "not_found": "Nie znaleziono zamówienia."
+      "not_found": "Nie znaleziono zamówienia.",
+      "no_next_status": "To zamówienie czeka na przypisanie kierowcy.",
+      "status_change_not_allowed": "Nie możesz wykonać tej zmiany statusu.",
+      "driver_not_found": "Nie znaleziono kierowcy w tym lokalu."
     }
   },
   "validation": {
@@ -305,5 +308,71 @@
     "Cash": "Gotówka",
     "CardOnDelivery": "Karta przy odbiorze",
     "Online": "Online"
+  },
+  "orders": {
+    "title": "Zamówienia",
+    "location": "Lokal",
+    "newOrder": "Nowe zamówienie",
+    "columns": {
+      "New": "Nowe",
+      "InProgress": "W realizacji",
+      "Ready": "Gotowe",
+      "OnTheWay": "W drodze"
+    },
+    "empty": "Brak zamówień.",
+    "minutesAgo": "{{minutes}} min",
+    "delivery": "Dostawa",
+    "pickup": "Odbiór",
+    "phone": "Tel.",
+    "call": "Zadzwoń",
+    "notes": "Uwagi: {{notes}}",
+    "total": "{{total}} · {{payment}}",
+    "paid": "opłacone",
+    "action": {
+      "Accepted": "Przyjmij",
+      "InPreparation": "Do przygotowania",
+      "Ready": "Gotowe",
+      "PickedUp": "Wydane",
+      "InDelivery": "Wyjechał",
+      "Delivered": "Dostarczone"
+    },
+    "driver": "Kierowca",
+    "assignDriver": "Przypisz kierowcę",
+    "noDrivers": "Brak kierowców w tym lokalu.",
+    "driverAssigned": "Kierowca: {{name}}",
+    "cancel": "Anuluj",
+    "cancelReason": "Powód anulowania",
+    "confirmCancel": "Anuluj zamówienie",
+    "back": "Wróć",
+    "live": "Na żywo",
+    "offline": "Brak połączenia na żywo — odświeżam co 30 s"
+  },
+  "phoneOrder": {
+    "title": "Nowe zamówienie telefoniczne",
+    "phone": "Telefon klienta",
+    "name": "Imię klienta",
+    "product": "Produkt",
+    "size": "Rozmiar",
+    "halfAndHalf": "Pół na pół",
+    "secondHalf": "Druga połowa",
+    "quantity": "Ilość",
+    "itemNotes": "Uwagi do pozycji",
+    "addItem": "Dodaj pozycję",
+    "items": "Pozycje",
+    "noItems": "Dodaj co najmniej jedną pozycję.",
+    "submit": "Złóż zamówienie · {{total}}",
+    "submitHint": "Ctrl+Enter składa zamówienie.",
+    "pickupHere": "Odbiór w tym lokalu"
+  },
+  "staffOrderStatus": {
+    "New": "Nowe",
+    "Accepted": "Przyjęte",
+    "InPreparation": "W przygotowaniu",
+    "Ready": "Gotowe",
+    "AssignedToDriver": "Kierowca przypisany",
+    "InDelivery": "W drodze",
+    "Delivered": "Dostarczone",
+    "PickedUp": "Odebrane",
+    "Cancelled": "Anulowane"
   }
 }

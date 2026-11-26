@@ -8,20 +8,26 @@ import {
 } from '@pizzeria/api-client';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { createContext, useContext, useEffect, type ReactNode } from 'react';
+import { playNewOrderSound, signalROrdersFeed, type OrdersFeed } from './ordersFeed';
 
 export interface AppServices {
   session: AuthSession;
   api: ApiClient;
   queryClient: QueryClient;
+  ordersFeed: OrdersFeed;
+  /** Alert for a new order (beep); replaceable in tests. */
+  newOrderAlert: () => void;
 }
 
 export interface AppServicesOptions {
   /** Injected in tests; the browser fetch otherwise. */
   fetch?: (request: Request) => Promise<Response>;
   store?: RefreshTokenStore;
+  ordersFeed?: OrdersFeed;
+  newOrderAlert?: () => void;
 }
 
-export function createAppServices({ fetch, store }: AppServicesOptions = {}): AppServices {
+export function createAppServices({ fetch, store, ordersFeed, newOrderAlert }: AppServicesOptions = {}): AppServices {
   const session = new AuthSession({
     store: store ?? localStorageTokenStore(),
     ...(fetch ? { fetch: (input, init) => fetch(new Request(toAbsoluteUrl(input), init)) } : {}),
@@ -30,6 +36,8 @@ export function createAppServices({ fetch, store }: AppServicesOptions = {}): Ap
   return {
     session,
     api: createApiClient({ session, ...(fetch ? { fetch } : {}) }),
+    ordersFeed: ordersFeed ?? signalROrdersFeed(session),
+    newOrderAlert: newOrderAlert ?? playNewOrderSound,
     queryClient: new QueryClient({
       defaultOptions: {
         queries: {

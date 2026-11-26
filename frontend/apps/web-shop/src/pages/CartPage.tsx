@@ -1,10 +1,9 @@
-import type { MenuDto } from '@pizzeria/api-client';
+import { previewUnitPrice, type MenuDto } from '@pizzeria/api-client';
 import { formatMoney, useTranslation } from '@pizzeria/i18n';
 import { Button, buttonClassName } from '@pizzeria/ui';
 import { Link } from 'react-router';
 import { useShop } from '../app/services';
 import { useCart, type CartItem } from '../cart/cart';
-import { previewUnitPrice } from '../menu/pricing';
 
 /** Human description of a cart line: "Margherita / Pepperoni, 42 cm, Czosnkowy". */
 export function describeItem(menu: MenuDto, item: CartItem): { title: string; details: string } {

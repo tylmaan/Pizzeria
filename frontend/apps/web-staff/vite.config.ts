@@ -24,7 +24,10 @@ export default defineConfig({
   server: {
     port: 5173,
     // Keep the browser's Host (the shop is recognised by its subdomain) and add X-Forwarded-* headers.
-    proxy: { '/api': { target: 'http://localhost:5080', changeOrigin: false, xfwd: true } },
+    proxy: {
+      '/api': { target: 'http://localhost:5080', changeOrigin: false, xfwd: true },
+      '/hubs': { target: 'http://localhost:5080', changeOrigin: false, xfwd: true, ws: true },
+    },
   },
   test: {
     environment: 'jsdom',

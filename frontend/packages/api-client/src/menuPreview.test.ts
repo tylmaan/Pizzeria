@@ -1,6 +1,24 @@
 import { describe, expect, test } from 'vitest';
-import { menu } from '../test/fixtures';
-import { allowedGroups, previewUnitPrice, selectionIsComplete } from './pricing';
+import { allowedGroups, previewUnitPrice, selectionIsComplete } from './menuPreview';
+import type { components } from './schema';
+
+const menu: components['schemas']['MenuDto'] = {
+  halfAndHalfPricing: 'MoreExpensiveHalf',
+  categories: [{ id: 'pizza', name: 'Pizza', sizes: [{ id: 's32', name: '32 cm' }, { id: 's42', name: '42 cm' }] }],
+  products: [
+    { id: 'margherita', categoryId: 'pizza', name: 'Margherita', description: null, isActive: true, allowsHalves: true,
+      prices: [{ sizeId: 's32', price: 25 }, { sizeId: 's42', price: 32 }], modifierGroupIds: ['sauce', 'toppings'] },
+    { id: 'pepperoni', categoryId: 'pizza', name: 'Pepperoni', description: null, isActive: true, allowsHalves: true,
+      prices: [{ sizeId: 's32', price: 30 }, { sizeId: 's42', price: 38 }], modifierGroupIds: ['sauce'] },
+  ],
+  modifierGroups: [
+    { id: 'sauce', categoryId: 'pizza', name: 'Sos', minSelect: 1, maxSelect: 1, modifiers: [
+      { id: 'garlic', name: 'Czosnkowy', isActive: true, prices: [{ sizeId: 's32', price: 2 }, { sizeId: 's42', price: 2 }] },
+      { id: 'tomato', name: 'Pomidorowy', isActive: true, prices: [{ sizeId: 's32', price: 2 }, { sizeId: 's42', price: 3 }] } ] },
+    { id: 'toppings', categoryId: 'pizza', name: 'Dodatki', minSelect: 0, maxSelect: 2, modifiers: [
+      { id: 'cheese', name: 'Ser', isActive: true, prices: [{ sizeId: 's32', price: 4 }, { sizeId: 's42', price: 6 }] } ] },
+  ],
+};
 
 const margherita = menu.products[0]!;
 const pepperoni = menu.products[1]!;

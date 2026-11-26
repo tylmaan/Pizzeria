@@ -965,6 +965,263 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/locations/{locationId}/orders": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: {
+                    scope?: components["schemas"]["OrderListScope"];
+                };
+                header?: never;
+                path: {
+                    locationId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["StaffOrderDto"][];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    locationId: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["PlaceOrderRequest"];
+                };
+            };
+            responses: {
+                /** @description Created */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["PlacedOrderDto"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/locations/{locationId}/drivers": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    locationId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["DriverDto"][];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/orders/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["StaffOrderDto"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/orders/{id}/advance": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["StaffOrderDto"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/orders/{id}/cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["CancelOrderRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["StaffOrderDto"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/orders/{id}/driver": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["AssignDriverRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["StaffOrderDto"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -984,6 +1241,13 @@ export interface components {
         AssignableRoleDto: {
             role: string;
             requiresLocations: boolean;
+        };
+        AssignDriverRequest: {
+            /** Format: uuid */
+            driverId: string;
+        };
+        CancelOrderRequest: {
+            reason: string;
         };
         CategoryDto: {
             /** Format: uuid */
@@ -1064,6 +1328,11 @@ export interface components {
             /** Format: int32 */
             estimatedMinutes: number;
             isActive: boolean;
+        };
+        DriverDto: {
+            /** Format: uuid */
+            id: string;
+            displayName: string;
         };
         /** @enum {unknown} */
         FulfillmentType: "Delivery" | "Pickup";
@@ -1163,6 +1432,10 @@ export interface components {
             /** Format: double */
             price: number;
         };
+        /** @enum {unknown} */
+        OrderListScope: "Active" | "Today" | null;
+        /** @enum {unknown} */
+        OrderSource: "Online" | "Phone" | "InStore";
         /** @enum {unknown} */
         OrderStatus: "New" | "Accepted" | "InPreparation" | "Ready" | "AssignedToDriver" | "InDelivery" | "Delivered" | "PickedUp" | "Cancelled";
         OrderStatusChangeDto: {
@@ -1298,6 +1571,42 @@ export interface components {
             /** Format: uuid */
             id: null | string;
             name: string;
+        };
+        StaffOrderDto: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            locationId: string;
+            /** Format: int32 */
+            number: number;
+            status: components["schemas"]["OrderStatus"];
+            nextStatus: null | components["schemas"]["OrderStatus"];
+            fulfillment: components["schemas"]["FulfillmentType"];
+            source: components["schemas"]["OrderSource"];
+            /** Format: date-time */
+            placedAt: string;
+            /** Format: date-time */
+            acceptedAt: null | string;
+            /** Format: date-time */
+            statusChangedAt: string;
+            customerName: string;
+            customerPhone: string;
+            deliveryAddress: null | components["schemas"]["AddressDto"];
+            deliveryNotes: null | string;
+            deliveryPoint: null | components["schemas"]["GeoPointDto"];
+            notes: null | string;
+            items: components["schemas"]["OrderItemDto"][];
+            /** Format: double */
+            itemsTotal: number;
+            /** Format: double */
+            deliveryFee: number;
+            /** Format: double */
+            total: number;
+            paymentMethod: components["schemas"]["PaymentMethod"];
+            paymentStatus: components["schemas"]["PaymentStatus"];
+            /** Format: uuid */
+            driverId: null | string;
+            cancellationReason: null | string;
         };
         UpdateLocationRequest: {
             name: string;

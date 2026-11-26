@@ -1,6 +1,10 @@
-import type { MenuDto, ModifierGroupDto, ProductDto } from '@pizzeria/api-client';
+import type { components } from './schema';
 
-// Price PREVIEW for the cart. The API prices every order from scratch (Domain ItemPricing) and ignores
+type MenuDto = components['schemas']['MenuDto'];
+type ModifierGroupDto = components['schemas']['ModifierGroupDto'];
+type ProductDto = components['schemas']['ProductDto'];
+
+// Price PREVIEW for the shop cart and phone orders. The API prices every order from scratch (Domain ItemPricing) and ignores
 // anything computed here, so this only has to be good enough to show the customer a sensible total.
 
 export type ItemChoice = {

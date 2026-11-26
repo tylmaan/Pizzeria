@@ -1,10 +1,9 @@
-import { errorCodeOf } from '@pizzeria/api-client';
+import { errorCodeOf, previewUnitPrice } from '@pizzeria/api-client';
 import { formatMoney, useCodeTranslations, useTranslation } from '@pizzeria/i18n';
 import { Alert } from '@pizzeria/ui';
 import { Link, Outlet, useLocation } from 'react-router';
 import { useShop } from '../app/services';
 import { useCart } from '../cart/cart';
-import { previewUnitPrice } from '../menu/pricing';
 
 export function Layout() {
   const { t } = useTranslation();
