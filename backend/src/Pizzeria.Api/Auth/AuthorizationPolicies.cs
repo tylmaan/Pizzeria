@@ -13,6 +13,7 @@ public static class AuthorizationPolicies
     public const string CompanyAdmin = nameof(CompanyAdmin);
     public const string StaffManagement = nameof(StaffManagement);
     public const string CompanyStaff = nameof(CompanyStaff);
+    public const string Driver = nameof(Driver);
 
     public static void Configure(AuthorizationBuilder builder)
     {
@@ -23,6 +24,7 @@ public static class AuthorizationPolicies
 
         builder.AddPolicy(PlatformAdmin, p => p.RequireRole(Roles.PlatformAdmin));
         builder.AddPolicy(CompanyAdmin, p => p.RequireRole(Roles.CompanyAdmin));
+        builder.AddPolicy(Driver, p => p.RequireRole(Roles.Driver));
         builder.AddPolicy(StaffManagement, p => p.RequireRole(Roles.CompanyAdmin, Roles.LocationManager));
         builder.AddPolicy(
             CompanyStaff,

@@ -5,6 +5,7 @@ using Pizzeria.Application.Abstractions;
 using Pizzeria.Application.Tenancy;
 using Pizzeria.Domain.Common;
 using Pizzeria.Domain.Delivery;
+using Pizzeria.Domain.Drivers;
 using Pizzeria.Domain.Menu;
 using Pizzeria.Domain.Orders;
 using Pizzeria.Domain.Tenancy;
@@ -34,6 +35,8 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options, ITenant
     public DbSet<DeliveryZone> DeliveryZones => Set<DeliveryZone>();
 
     public DbSet<Order> Orders => Set<Order>();
+
+    public DbSet<DriverShift> DriverShifts => Set<DriverShift>();
 
     public DbSet<UserLocation> UserLocations => Set<UserLocation>();
 

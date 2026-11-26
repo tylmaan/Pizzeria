@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Pizzeria.Domain.Delivery;
+using Pizzeria.Domain.Drivers;
 using Pizzeria.Domain.Menu;
 using Pizzeria.Domain.Orders;
 using Pizzeria.Domain.Tenancy;
@@ -27,6 +28,8 @@ public interface IAppDbContext
     DbSet<DeliveryZone> DeliveryZones { get; }
 
     DbSet<Order> Orders { get; }
+
+    DbSet<DriverShift> DriverShifts { get; }
 
     DatabaseFacade Database { get; }
 

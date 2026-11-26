@@ -125,6 +125,7 @@ api.MapMenuEndpoints();
 api.MapDeliveryEndpoints();
 api.MapShopEndpoints();
 api.MapOrderEndpoints();
+api.MapDriverEndpoints();
 
 // Anonymous connections are allowed (customer tracking); hub methods check access themselves.
 app.MapHub<OrdersHub>(OrdersHub.Path).AllowAnonymous();

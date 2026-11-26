@@ -219,6 +219,103 @@ namespace Pizzeria.Infrastructure.Persistence.Migrations
                     b.ToTable("delivery_zones", (string)null);
                 });
 
+            modelBuilder.Entity("Pizzeria.Domain.Drivers.DriverShift", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<decimal>("CardCollected")
+                        .HasPrecision(10, 2)
+                        .HasColumnType("numeric(10,2)")
+                        .HasColumnName("card_collected");
+
+                    b.Property<decimal>("CashCollected")
+                        .HasPrecision(10, 2)
+                        .HasColumnType("numeric(10,2)")
+                        .HasColumnName("cash_collected");
+
+                    b.Property<Guid>("CompanyId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("company_id");
+
+                    b.Property<decimal?>("CountedCash")
+                        .HasPrecision(10, 2)
+                        .HasColumnType("numeric(10,2)")
+                        .HasColumnName("counted_cash");
+
+                    b.Property<int>("DeliveriesCount")
+                        .HasColumnType("integer")
+                        .HasColumnName("deliveries_count");
+
+                    b.Property<string>("DiscrepancyComment")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)")
+                        .HasColumnName("discrepancy_comment");
+
+                    b.Property<Guid>("DriverId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("driver_id");
+
+                    b.Property<DateTimeOffset?>("EndedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("ended_at");
+
+                    b.Property<Guid>("LocationId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("location_id");
+
+                    b.Property<decimal>("PaidOnline")
+                        .HasPrecision(10, 2)
+                        .HasColumnType("numeric(10,2)")
+                        .HasColumnName("paid_online");
+
+                    b.Property<DateTimeOffset?>("SettledAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("settled_at");
+
+                    b.Property<Guid?>("SettledByUserId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("settled_by_user_id");
+
+                    b.Property<DateTimeOffset>("StartedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("started_at");
+
+                    b.Property<decimal>("StartingCash")
+                        .HasPrecision(10, 2)
+                        .HasColumnType("numeric(10,2)")
+                        .HasColumnName("starting_cash");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("status");
+
+                    b.Property<decimal>("Tips")
+                        .HasPrecision(10, 2)
+                        .HasColumnType("numeric(10,2)")
+                        .HasColumnName("tips");
+
+                    b.HasKey("Id")
+                        .HasName("pk_driver_shifts");
+
+                    b.HasIndex("CompanyId")
+                        .HasDatabaseName("ix_driver_shifts_company_id");
+
+                    b.HasIndex("DriverId")
+                        .IsUnique()
+                        .HasDatabaseName("ix_driver_shifts_driver_id")
+                        .HasFilter("status = 'Open'");
+
+                    b.HasIndex("LocationId", "Status")
+                        .HasDatabaseName("ix_driver_shifts_location_id_status");
+
+                    b.ToTable("driver_shifts", (string)null);
+                });
+
             modelBuilder.Entity("Pizzeria.Domain.Menu.Category", b =>
                 {
                     b.Property<Guid>("Id")
@@ -799,6 +896,23 @@ namespace Pizzeria.Infrastructure.Persistence.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
                         .HasConstraintName("fk_delivery_zones_locations_location_id");
+                });
+
+            modelBuilder.Entity("Pizzeria.Domain.Drivers.DriverShift", b =>
+                {
+                    b.HasOne("Pizzeria.Domain.Tenancy.Company", null)
+                        .WithMany()
+                        .HasForeignKey("CompanyId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_driver_shifts_companies_company_id");
+
+                    b.HasOne("Pizzeria.Domain.Tenancy.Location", null)
+                        .WithMany()
+                        .HasForeignKey("LocationId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_driver_shifts_locations_location_id");
                 });
 
             modelBuilder.Entity("Pizzeria.Domain.Menu.Category", b =>

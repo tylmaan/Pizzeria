@@ -1,6 +1,7 @@
 using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
 using Pizzeria.Application.Delivery;
+using Pizzeria.Application.Drivers;
 using Pizzeria.Application.Locations;
 using Pizzeria.Application.Menu;
 using Pizzeria.Application.Orders;
@@ -23,6 +24,7 @@ public static class DependencyInjection
 
         services.AddScoped<CompanyService>();
         services.AddScoped<DeliveryZoneService>();
+        services.AddScoped<DriverShiftService>();
         services.AddScoped<DeliveryResolver>();
         services.AddScoped<DeliveryCheckService>();
         services.AddScoped<LocationService>();
