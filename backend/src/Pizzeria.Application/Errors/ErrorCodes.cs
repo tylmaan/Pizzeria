@@ -33,6 +33,8 @@ public static class ErrorCodes
 
     public const string ShiftNotFound = "shift.not_found";
 
+    public const string InvalidReportRange = "report.invalid_range";
+
     public const string PaymentNotFound = "payment.not_found";
     public const string PaymentProviderNotFound = "payment.provider_not_found";
     public const string InvalidSignature = "payment.invalid_signature";

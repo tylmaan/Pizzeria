@@ -6,12 +6,14 @@ using Pizzeria.Application.Abstractions;
 using Pizzeria.Application.Delivery;
 using Pizzeria.Application.Orders;
 using Pizzeria.Application.Payments;
+using Pizzeria.Application.Reports;
 using Pizzeria.Application.Tenancy;
 using Pizzeria.Application.Users;
 using Pizzeria.Infrastructure.Geocoding;
 using Pizzeria.Infrastructure.Identity;
 using Pizzeria.Infrastructure.Orders;
 using Pizzeria.Infrastructure.Payments;
+using Pizzeria.Infrastructure.Reports;
 using Pizzeria.Infrastructure.Persistence;
 using Pizzeria.Infrastructure.Tenancy;
 
@@ -43,6 +45,7 @@ public static class DependencyInjection
         services.AddScoped<ICompanyResolver, CompanyResolver>();
         services.AddScoped<IUserAccountService, UserAccountService>();
         services.AddScoped<IOrderNumberGenerator, OrderNumberGenerator>();
+        services.AddScoped<IReportQueries, ReportQueries>();
 
         services.Configure<PaymentOptions>(configuration.GetSection(PaymentOptions.SectionName));
         services.AddSingleton<FakePaymentProvider>();

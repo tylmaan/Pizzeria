@@ -7,6 +7,7 @@ using Pizzeria.Application.Menu;
 using Pizzeria.Application.Orders;
 using Pizzeria.Application.Payments;
 using Pizzeria.Application.Platform;
+using Pizzeria.Application.Reports;
 using Pizzeria.Application.Tenancy;
 using Pizzeria.Application.Users;
 
@@ -35,6 +36,7 @@ public static class DependencyInjection
         services.AddScoped<ShopService>();
         services.AddScoped<PlaceOrderService>();
         services.AddScoped<PaymentService>();
+        services.AddScoped<ReportService>();
         services.AddScoped<OrderTrackingService>();
         services.AddScoped<OrderQueueService>();
         services.AddScoped<OrderWorkflowService>();
