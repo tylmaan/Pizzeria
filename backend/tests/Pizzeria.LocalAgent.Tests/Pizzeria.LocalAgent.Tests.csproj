@@ -1,0 +1,7 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Pizzeria.LocalAgent\Pizzeria.LocalAgent.csproj" />
+  </ItemGroup>
+
+</Project>

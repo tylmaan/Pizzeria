@@ -79,6 +79,7 @@
       "not_found": "Nie znaleziono.",
       "forbidden": "Nie masz uprawnień do tej operacji.",
       "unexpected": "Coś poszło nie tak. Spróbuj ponownie.",
+      "bad_request": "Nieprawidłowe żądanie. Odśwież stronę i spróbuj ponownie.",
       "too_many_requests": "Za dużo prób. Odczekaj chwilę i spróbuj ponownie.",
       "network": "Brak połączenia z serwerem. Sprawdź internet."
     },

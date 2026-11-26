@@ -8,6 +8,9 @@ public static class ErrorCodes
     public const string Forbidden = "common.forbidden";
     public const string Unauthorized = "auth.unauthorized";
     public const string Unexpected = "common.unexpected";
+
+    /// <summary>The request could not be read (malformed JSON, missing required fields).</summary>
+    public const string BadRequest = "common.bad_request";
     public const string TooManyRequests = "common.too_many_requests";
 
     public const string InvalidCredentials = "auth.invalid_credentials";

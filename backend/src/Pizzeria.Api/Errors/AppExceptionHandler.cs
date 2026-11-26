@@ -14,6 +14,8 @@ public sealed class AppExceptionHandler(IProblemDetailsService problemDetails) :
         var (status, code, errors) = exception switch
         {
             ValidationException e => (StatusCodes.Status400BadRequest, ErrorCodes.ValidationFailed, ToErrors(e)),
+            // Unreadable body: thrown in Development only (elsewhere the framework answers 400 itself).
+            BadHttpRequestException e => (e.StatusCode, ErrorCodes.BadRequest, null),
             NotFoundException e => (StatusCodes.Status404NotFound, e.Code, null),
             ForbiddenException e => (StatusCodes.Status403Forbidden, e.Code, null),
             ConflictException e => (StatusCodes.Status409Conflict, e.Code, null),
