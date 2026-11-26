@@ -123,6 +123,17 @@ Każdy stan przed Delivered/PickedUp → Cancelled (z powodem)
 
 - Przejścia stanów tylko przez metody domenowe (`order.Accept()`, `order.AssignDriver(...)` itd.), nigdy przez ustawienie pola z zewnątrz. Niedozwolone przejście = wyjątek domenowy.
 - Każda zmiana statusu zapisywana w historii (`OrderStatusHistory`: kto, kiedy, z jakiego na jaki) i rozsyłana przez SignalR.
+
+**Jak to jest zrobione (Domain/Orders, Application/Orders):**
+- `Order.Place(...)` przyjmuje linie już wycenione przez `ItemPricing` (snapshot nazw, rozmiaru, dodatków i cen w `OrderItem`). Liczy sumy, cenę dostawy i sprawdza minimum strefy. Status startowy to `New`, płatność `Unpaid`.
+- `Order.NextStatus` / `Advance()` to „jedno kliknięcie = następny status” dla kuchni i kolejki. `Ready` → kierowca wymaga `AssignDriver(...)`. Gotówka i karta przy odbiorze: płatność zmienia się na `Paid` przy `Delivered`/`PickedUp`.
+- Płatność `Online` jest odrzucana (`order.payment_method_not_available`) do czasu operatora płatności (etap 2).
+- Numer zamówienia jest krótki, per lokal i dzień lokalny (strefa czasowa lokalu). Generuje go atomowy upsert w `order_counters` (`OrderNumberGenerator`).
+- `TrackingToken` to losowy sekret w linku śledzenia. `GET /api/shop/orders/{token}` nadal podlega filtrowi tenanta (firma z subdomeny).
+- `PlaceOrderService` obsługuje sklep (`Online`, anonimowo) i jest gotowy na zamówienia telefoniczne (`Phone`, `tenant.UserId` w historii). Lokal dla dostawy wynika ze strefy (`DeliveryResolver`), dla odbioru wybiera go klient.
+- `IOrderNotifier` (na razie `NullOrderNotifier`) to punkt, w którym podłączymy SignalR.
+- **Godzin otwarcia jeszcze nie ma**: zamówienia są przyjmowane zawsze.
+- **Dev:** sklep działa na `http://demo.localhost:5174` (subdomena = slug firmy). Proxy Vite zachowuje `Host` (`changeOrigin: false`), a API obsługuje `X-Forwarded-*` (ufa tylko proxy z loopbacka; produkcja musi dodać sieć swojego proxy).
 - Źródło zamówienia: `Online` (sklep) lub `Phone`/`InStore` (panel lokalu).
 - Status płatności niezależny od statusu zamówienia: `Unpaid`, `PendingOnline`, `Paid`, `Refunded`.
 - Metoda płatności: `Cash`, `CardOnDelivery`, `Online`.
@@ -311,7 +322,7 @@ Cel: jedno zamówienie przechodzi całą drogę od klienta do dostarczenia.
 2. ✅ Firmy, lokale, użytkownicy, role, auth, middleware tenanta — API oraz UI: logowanie, panel firmy (lokale, pracownicy)
 3. ✅ Menu firmy: kategorie, produkty, rozmiary, modyfikatory, pół na pół (prosty edytor w panelu firmy)
 4. ✅ Strefy dostaw lokalu + geokodowanie (fake/prosty dostawca)
-5. Sklep klienta: menu → koszyk → adres → zamówienie jako gość, płatność przy odbiorze, strona śledzenia
+5. ✅ Sklep klienta: menu → koszyk → adres → zamówienie jako gość, płatność przy odbiorze, strona śledzenia (na razie odświeża status co 15 s; SignalR razem z kolejką zamówień w kroku 6)
 6. Panel lokalu: kolejka zamówień na żywo, zamówienie telefoniczne, zmiany statusów
 7. Ekran kuchni
 8. Aplikacja kierowcy: lista kursów, statusy, nawigacja

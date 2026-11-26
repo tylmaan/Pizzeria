@@ -854,6 +854,117 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/shop": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ShopDto"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/shop/orders": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["PlaceOrderRequest"];
+                };
+            };
+            responses: {
+                /** @description Created */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["PlacedOrderDto"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/shop/orders/{token}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    token: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["OrderTrackingDto"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -862,7 +973,7 @@ export interface components {
             tokenType?: null | string;
             accessToken: string;
             /** Format: int64 */
-            expiresIn: number | string;
+            expiresIn: number;
             refreshToken: string;
         };
         AddressDto: {
@@ -907,6 +1018,16 @@ export interface components {
             role: string;
             locationIds: null | string[];
         };
+        CustomerInput: {
+            name: string;
+            phone: string;
+        };
+        DeliveryAddressInput: {
+            street: string;
+            postalCode: string;
+            city: string;
+            notes: null | string;
+        };
         DeliveryCheckRequest: {
             street: string;
             postalCode: string;
@@ -923,11 +1044,11 @@ export interface components {
             zoneId: null | string;
             zoneName: null | string;
             /** Format: double */
-            deliveryFee: null | number | string;
+            deliveryFee: null | number;
             /** Format: double */
-            minOrderValue: null | number | string;
+            minOrderValue: null | number;
             /** Format: int32 */
-            estimatedMinutes: null | number | string;
+            estimatedMinutes: null | number;
         };
         DeliveryZoneDto: {
             /** Format: uuid */
@@ -937,18 +1058,20 @@ export interface components {
             name: string;
             boundary: components["schemas"]["GeoPointDto"][];
             /** Format: double */
-            deliveryFee: number | string;
+            deliveryFee: number;
             /** Format: double */
-            minOrderValue: number | string;
+            minOrderValue: number;
             /** Format: int32 */
-            estimatedMinutes: number | string;
+            estimatedMinutes: number;
             isActive: boolean;
         };
+        /** @enum {unknown} */
+        FulfillmentType: "Delivery" | "Pickup";
         GeoPointDto: {
             /** Format: double */
-            latitude: number | string;
+            latitude: number;
             /** Format: double */
-            longitude: number | string;
+            longitude: number;
         };
         /** @enum {unknown} */
         HalfAndHalfPricing: "MoreExpensiveHalf" | "AverageOfHalves";
@@ -998,9 +1121,9 @@ export interface components {
             categoryId: string;
             name: string;
             /** Format: int32 */
-            minSelect: number | string;
+            minSelect: number;
             /** Format: int32 */
-            maxSelect: number | string;
+            maxSelect: number;
             modifiers: components["schemas"]["ModifierDto"][];
         };
         ModifierInput: {
@@ -1010,17 +1133,98 @@ export interface components {
             isActive: boolean;
             prices: components["schemas"]["PriceDto"][];
         };
+        OrderItemDto: {
+            productName: string;
+            secondHalfProductName: null | string;
+            sizeName: string;
+            /** Format: int32 */
+            quantity: number;
+            /** Format: double */
+            unitPrice: number;
+            /** Format: double */
+            lineTotal: number;
+            modifiers: components["schemas"]["OrderItemModifierDto"][];
+            notes: null | string;
+        };
+        OrderItemInput: {
+            /** Format: uuid */
+            productId: string;
+            /** Format: uuid */
+            secondHalfProductId: null | string;
+            /** Format: uuid */
+            sizeId: string;
+            /** Format: int32 */
+            quantity: number;
+            modifierIds: string[];
+            notes: null | string;
+        };
+        OrderItemModifierDto: {
+            name: string;
+            /** Format: double */
+            price: number;
+        };
+        /** @enum {unknown} */
+        OrderStatus: "New" | "Accepted" | "InPreparation" | "Ready" | "AssignedToDriver" | "InDelivery" | "Delivered" | "PickedUp" | "Cancelled";
+        OrderStatusChangeDto: {
+            status: components["schemas"]["OrderStatus"];
+            /** Format: date-time */
+            at: string;
+        };
+        OrderTrackingDto: {
+            /** Format: int32 */
+            number: number;
+            status: components["schemas"]["OrderStatus"];
+            fulfillment: components["schemas"]["FulfillmentType"];
+            locationName: string;
+            /** Format: date-time */
+            placedAt: string;
+            items: components["schemas"]["OrderItemDto"][];
+            /** Format: double */
+            itemsTotal: number;
+            /** Format: double */
+            deliveryFee: number;
+            /** Format: double */
+            total: number;
+            paymentMethod: components["schemas"]["PaymentMethod"];
+            paymentStatus: components["schemas"]["PaymentStatus"];
+            deliveryAddress: null | components["schemas"]["AddressDto"];
+            cancellationReason: null | string;
+            history: components["schemas"]["OrderStatusChangeDto"][];
+        };
+        /** @enum {unknown} */
+        PaymentMethod: "Cash" | "CardOnDelivery" | "Online";
+        /** @enum {unknown} */
+        PaymentStatus: "Unpaid" | "PendingOnline" | "Paid" | "Refunded";
+        PlacedOrderDto: {
+            /** Format: uuid */
+            id: string;
+            /** Format: int32 */
+            number: number;
+            trackingToken: string;
+            /** Format: double */
+            total: number;
+        };
+        PlaceOrderRequest: {
+            fulfillment: components["schemas"]["FulfillmentType"];
+            /** Format: uuid */
+            pickupLocationId: null | string;
+            deliveryAddress: null | components["schemas"]["DeliveryAddressInput"];
+            customer: components["schemas"]["CustomerInput"];
+            paymentMethod: components["schemas"]["PaymentMethod"];
+            notes: null | string;
+            items: components["schemas"]["OrderItemInput"][];
+        };
         PriceDto: {
             /** Format: uuid */
             sizeId: string;
             /** Format: double */
-            price: number | string;
+            price: number;
         };
         ProblemDetails: {
             type?: null | string;
             title?: null | string;
             /** Format: int32 */
-            status?: null | number | string;
+            status?: null | number;
             detail?: null | string;
             instance?: null | string;
         };
@@ -1047,11 +1251,11 @@ export interface components {
             name: string;
             boundary: components["schemas"]["GeoPointDto"][];
             /** Format: double */
-            deliveryFee: number | string;
+            deliveryFee: number;
             /** Format: double */
-            minOrderValue: number | string;
+            minOrderValue: number;
             /** Format: int32 */
-            estimatedMinutes: number | string;
+            estimatedMinutes: number;
             isActive: boolean;
         };
         SaveModifierGroupRequest: {
@@ -1059,9 +1263,9 @@ export interface components {
             categoryId: string;
             name: string;
             /** Format: int32 */
-            minSelect: number | string;
+            minSelect: number;
             /** Format: int32 */
-            maxSelect: number | string;
+            maxSelect: number;
             modifiers: components["schemas"]["ModifierInput"][];
         };
         SaveProductRequest: {
@@ -1073,6 +1277,17 @@ export interface components {
             isActive: boolean;
             prices: components["schemas"]["PriceDto"][];
             modifierGroupIds: string[];
+        };
+        ShopDto: {
+            companyName: string;
+            locations: components["schemas"]["ShopLocationDto"][];
+            menu: components["schemas"]["MenuDto"];
+        };
+        ShopLocationDto: {
+            /** Format: uuid */
+            id: string;
+            name: string;
+            address: components["schemas"]["AddressDto"];
         };
         SizeDto: {
             /** Format: uuid */

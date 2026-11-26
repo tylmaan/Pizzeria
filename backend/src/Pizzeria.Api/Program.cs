@@ -1,6 +1,7 @@
 using System.Globalization;
 using System.Text.Json.Serialization;
 using System.Threading.RateLimiting;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
 using Pizzeria.Api.Auth;
 using Pizzeria.Api.Endpoints;
@@ -25,6 +26,8 @@ builder.Services.ConfigureHttpJsonOptions(options =>
 {
     options.SerializerOptions.RespectNullableAnnotations = true;
     options.SerializerOptions.RespectRequiredConstructorParameters = true;
+    // Numbers are numbers: no "12.50" strings accepted, so OpenAPI (and TypeScript) types are plain `number`.
+    options.SerializerOptions.NumberHandling = JsonNumberHandling.Strict;
     // Enums travel as names ("MoreExpensiveHalf"), which keeps them readable and stable in TypeScript.
     options.SerializerOptions.Converters.Add(new JsonStringEnumConverter());
 });
@@ -32,6 +35,11 @@ builder.Services.AddOpenApi();
 builder.Services.AddProblemDetails(options => options.CustomizeProblemDetails = ProblemDetailsCodes.AddDefaultCode);
 builder.Services.AddExceptionHandler<AppExceptionHandler>();
 builder.Services.AddHealthChecks();
+
+// Behind a reverse proxy: real client IP (rate limits), scheme and host (shop subdomain).
+// Only loopback proxies are trusted by default; production hosting must add its proxy network.
+builder.Services.Configure<ForwardedHeadersOptions>(options =>
+    options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto | ForwardedHeaders.XForwardedHost);
 
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration).AddSignInManager();
@@ -65,6 +73,8 @@ builder.Services.AddRateLimiter(options =>
 });
 
 var app = builder.Build();
+
+app.UseForwardedHeaders();
 
 // Request logging wraps the exception handler, so it logs the final status code (e.g. 400, not 500).
 app.UseSerilogRequestLogging();

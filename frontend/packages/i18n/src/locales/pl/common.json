@@ -129,7 +129,19 @@
       "shop_not_found": "Nie rozpoznano sklepu.",
       "invalid_boundary": "Nieprawidłowa granica strefy (np. linie się przecinają).",
       "invalid_estimate": "Czas dostawy musi być od 1 do 600 minut.",
-      "invalid_name": "Nieprawidłowa nazwa strefy."
+      "invalid_name": "Nieprawidłowa nazwa strefy.",
+      "address_not_delivered": "Nie dowozimy pod ten adres."
+    },
+    "order": {
+      "invalid_status_transition": "Tej zmiany statusu nie można wykonać.",
+      "items_required": "Koszyk jest pusty.",
+      "invalid_quantity": "Nieprawidłowa ilość.",
+      "below_minimum_value": "Za mała wartość zamówienia dla tego adresu.",
+      "address_required": "Podaj adres dostawy.",
+      "cancellation_reason_required": "Podaj powód anulowania.",
+      "invalid_customer": "Podaj imię i telefon.",
+      "payment_method_not_available": "Ta forma płatności nie jest jeszcze dostępna.",
+      "not_found": "Nie znaleziono zamówienia."
     }
   },
   "validation": {
@@ -157,7 +169,10 @@
     "less_than_or_equal": "Za duża wartość.",
     "boundary": "Strefa musi mieć od 3 do 500 punktów.",
     "coordinates": "Nieprawidłowe współrzędne.",
-    "inclusive_between": "Wartość poza dozwolonym zakresem."
+    "inclusive_between": "Wartość poza dozwolonym zakresem.",
+    "phone": "Podaj poprawny numer telefonu.",
+    "location_required": "Wybierz lokal.",
+    "address_required": "Podaj adres dostawy."
   },
   "menu": {
     "title": "Menu",
@@ -228,5 +243,67 @@
     "check": "Sprawdź",
     "delivers": "Dowozimy: {{location}}, strefa „{{zone}}”, dostawa {{fee}}, min. zamówienie {{min}}, ok. {{minutes}} min.",
     "noDelivery": "Ten adres jest poza strefami dostaw."
+  },
+  "shop": {
+    "cart": "Koszyk",
+    "cartButton": "Koszyk ({{count}}) · {{total}}",
+    "priceFrom": "od {{price}}",
+    "backToMenu": "Wróć do menu",
+    "size": "Rozmiar",
+    "halfAndHalf": "Pół na pół",
+    "secondHalf": "Druga połowa",
+    "chooseExactly": "wybierz {{count}}",
+    "chooseUpTo": "do {{count}}",
+    "chooseBetween": "wybierz {{min}}–{{max}}",
+    "quantity": "Ilość",
+    "decrease": "Mniej",
+    "increase": "Więcej",
+    "addToCart": "Dodaj do koszyka · {{price}}",
+    "emptyCart": "Koszyk jest pusty.",
+    "remove": "Usuń",
+    "itemsTotal": "Produkty",
+    "deliveryFee": "Dostawa",
+    "total": "Razem",
+    "totalPreview": "Ostateczną kwotę policzymy przy składaniu zamówienia.",
+    "checkout": "Zamów",
+    "checkoutTitle": "Twoje zamówienie",
+    "delivery": "Dostawa",
+    "pickup": "Odbiór osobisty",
+    "pickupLocation": "Lokal odbioru",
+    "street": "Ulica i numer",
+    "postalCode": "Kod pocztowy",
+    "city": "Miasto",
+    "addressNotes": "Wskazówki dla kierowcy (domofon, piętro)",
+    "checkAddress": "Sprawdź adres",
+    "deliveryTerms": "Dowozimy z lokalu {{location}}: dostawa {{fee}}, ok. {{minutes}} min.",
+    "minimumOrder": "Minimalna wartość zamówienia z dostawą: {{min}}.",
+    "outsideZone": "Niestety nie dowozimy pod ten adres. Możesz odebrać zamówienie osobiście.",
+    "name": "Imię",
+    "phone": "Telefon",
+    "payment": "Płatność",
+    "notes": "Uwagi do zamówienia",
+    "placeOrder": "Zamawiam i płacę przy odbiorze · {{total}}",
+    "placing": "Wysyłanie zamówienia…",
+    "orderTitle": "Zamówienie nr {{number}}",
+    "orderFrom": "Lokal: {{location}}",
+    "trackingHint": "Zachowaj ten link, aby śledzić zamówienie.",
+    "cancelled": "Zamówienie anulowane: {{reason}}",
+    "notFound": "Nie znaleziono zamówienia."
+  },
+  "orderStatus": {
+    "New": "Przyjęte do realizacji",
+    "Accepted": "Potwierdzone",
+    "InPreparation": "W przygotowaniu",
+    "Ready": "Gotowe",
+    "AssignedToDriver": "Czeka na kierowcę",
+    "InDelivery": "W drodze",
+    "Delivered": "Dostarczone",
+    "PickedUp": "Odebrane",
+    "Cancelled": "Anulowane"
+  },
+  "paymentMethod": {
+    "Cash": "Gotówka",
+    "CardOnDelivery": "Karta przy odbiorze",
+    "Online": "Online"
   }
 }

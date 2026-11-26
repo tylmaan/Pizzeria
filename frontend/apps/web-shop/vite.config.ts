@@ -7,9 +7,11 @@ export default defineConfig({
   plugins: [react(), tailwindcss()],
   server: {
     port: 5174,
-    proxy: { '/api': 'http://localhost:5080' },
+    // Keep the browser's Host (the shop is recognised by its subdomain) and add X-Forwarded-* headers.
+    proxy: { '/api': { target: 'http://localhost:5080', changeOrigin: false, xfwd: true } },
   },
   test: {
     environment: 'jsdom',
+    setupFiles: ['./src/test/setup.ts'],
   },
 });

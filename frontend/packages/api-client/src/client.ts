@@ -6,7 +6,8 @@ import type { paths } from './schema';
 export type ApiClient = Client<paths>;
 
 export interface ApiClientOptions {
-  session: AuthSession;
+  /** Signed-in session; omit for anonymous clients (customer shop). */
+  session?: AuthSession;
   /** Origin of the API. Defaults to the page origin (the dev server proxies `/api`). */
   baseUrl?: string;
   fetch?: (request: Request) => Promise<Response>;
@@ -17,7 +18,9 @@ export function createApiClient({ session, baseUrl, fetch }: ApiClientOptions): 
     baseUrl: baseUrl ?? globalThis.location?.origin ?? '',
     ...(fetch ? { fetch } : {}),
   });
-  client.use(authMiddleware(session));
+  if (session) {
+    client.use(authMiddleware(session));
+  }
   return client;
 }
 
@@ -44,11 +47,14 @@ type FetchResult<T> =
   | { data: T; error?: never; response: Response }
   | { data?: never; error: unknown; response: Response };
 
-/** Returns the response body or throws {@link ApiError} — the shape TanStack Query expects. */
-export async function unwrap<T>(request: Promise<FetchResult<T>>): Promise<T> {
+/**
+ * Returns the response body or throws {@link ApiError} — the shape TanStack Query expects.
+ * Every successful response of our API has a JSON body (no 204s), hence `NonNullable`.
+ */
+export async function unwrap<T>(request: Promise<FetchResult<T>>): Promise<NonNullable<T>> {
   const result = await request;
   if (!result.response.ok || result.error !== undefined) {
     throw new ApiError(result.response.status, result.error as ProblemDetails | undefined);
   }
-  return result.data as T;
+  return result.data as NonNullable<T>;
 }
