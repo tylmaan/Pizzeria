@@ -169,6 +169,9 @@
     "report": {
       "invalid_range": "Nieprawidłowy zakres dat (maksymalnie rok)."
     },
+    "customer": {
+      "too_many_addresses": "Możesz zapisać najwyżej 10 adresów."
+    },
     "printing": {
       "agent_not_found": "Nie znaleziono komputera z agentem.",
       "job_not_found": "Nie znaleziono wydruku.",
@@ -556,5 +559,32 @@
     "retry": "Ponów",
     "reprint": "Drukuj bon ponownie",
     "reprinted": "Bon wysłany do drukarki."
+  },
+  "account": {
+    "title": "Moje konto",
+    "signIn": "Zaloguj się",
+    "why": "Konto jest opcjonalne — możesz zamawiać jako gość. Z kontem masz historię zamówień i zapisane adresy.",
+    "loginTitle": "Mam konto",
+    "registerTitle": "Nowe konto",
+    "register": "Załóż konto",
+    "phoneOptional": "Telefon (opcjonalnie)",
+    "passwordHint": "Hasło: co najmniej 8 znaków, w tym cyfra.",
+    "orders": "Moje zamówienia",
+    "noOrders": "Nie masz jeszcze zamówień.",
+    "track": "Szczegóły",
+    "profile": "Dane",
+    "saved": "Zapisano.",
+    "addresses": "Zapisane adresy",
+    "addAddress": "Dodaj adres",
+    "label": "Nazwa (np. Dom, Praca)",
+    "saveAddress": "Zapisz adres",
+    "remove": "Usuń",
+    "delete": "Usuń konto",
+    "deleteWarning": "Konto, dane i zapisane adresy zostaną usunięte. Zamówienia zostają w pizzerii (rozliczenia), ale nie będą już powiązane z kontem.",
+    "deleteConfirm": "Tak, usuń konto",
+    "checkoutSignIn": "Masz konto? Zaloguj się, żeby zamówienie trafiło do historii.",
+    "savedAddress": "Zapisany adres",
+    "newAddress": "— nowy adres —",
+    "saveForLater": "Zapisz ten adres na koncie"
   }
 }

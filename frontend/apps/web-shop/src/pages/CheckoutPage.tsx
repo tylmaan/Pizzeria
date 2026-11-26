@@ -1,8 +1,9 @@
 import type { DeliveryQuoteDto, FulfillmentType, PaymentMethod } from '@pizzeria/api-client';
 import { formatMoney, useTranslation } from '@pizzeria/i18n';
-import { Alert, Button, TextField } from '@pizzeria/ui';
+import { Alert, Button, Checkbox, SelectField, TextField } from '@pizzeria/ui';
 import { useState, type FormEvent, type ReactNode } from 'react';
-import { Navigate, useNavigate } from 'react-router';
+import { Link, Navigate, useNavigate } from 'react-router';
+import { useAddAddress, useAddresses, useProfile, useSignedIn } from '../app/account';
 import { goToPayment, useDeliveryCheck, usePlaceOrder, useShop } from '../app/services';
 import { useCart } from '../cart/cart';
 import { useFormErrors } from '../lib/formErrors';
@@ -26,8 +27,17 @@ export function CheckoutPage() {
   const [postalCode, setPostalCode] = useState('');
   const [city, setCity] = useState('');
   const [addressNotes, setAddressNotes] = useState('');
-  const [name, setName] = useState('');
-  const [phone, setPhone] = useState('');
+  // null = not typed yet: a signed-in customer's profile fills in the default.
+  const [typedName, setName] = useState<string | null>(null);
+  const [typedPhone, setPhone] = useState<string | null>(null);
+  const signedIn = useSignedIn();
+  const profile = useProfile().data;
+  const savedAddresses = useAddresses().data ?? [];
+  const addAddress = useAddAddress();
+  const [savedAddressId, setSavedAddressId] = useState('');
+  const [saveAddress, setSaveAddress] = useState(false);
+  const name = typedName ?? profile?.name ?? '';
+  const phone = typedPhone ?? profile?.phone ?? '';
   const [payment, setPayment] = useState<PaymentMethod>('Cash');
   const [notes, setNotes] = useState('');
 
@@ -63,6 +73,9 @@ export function CheckoutPage() {
       {
         onSuccess: (order) => {
           cart.clear();
+          if (fulfillment === 'Delivery' && signedIn && saveAddress && savedAddressId === '') {
+            addAddress.mutate({ label: null, street, postalCode, city, notes: addressNotes || null });
+          }
           if (order.paymentRedirectUrl) {
             goToPayment(order.paymentRedirectUrl, navigate);
           } else {
@@ -96,14 +109,49 @@ export function CheckoutPage() {
         ))}
       </div>
 
+      {!signedIn && (
+        <p className="text-base">
+          <Link to="/account/login?next=/checkout" className="font-semibold text-orange-700 underline">
+            {t('account.checkoutSignIn')}
+          </Link>
+        </p>
+      )}
+
       {fulfillment === 'Delivery' ? (
         <fieldset className="flex flex-col gap-3">
-          <TextField label={t('shop.street')} autoComplete="street-address" value={street} onChange={(e) => setStreet(e.target.value)} error={placeErrors.field('deliveryAddress.street') ?? checkErrors.field('street')} />
+          {savedAddresses.length > 0 && (
+            <SelectField
+              label={t('account.savedAddress')}
+              value={savedAddressId}
+              onChange={(e) => {
+                const picked = savedAddresses.find((a) => a.id === e.target.value);
+                setSavedAddressId(picked?.id ?? '');
+                if (picked) {
+                  setStreet(picked.street);
+                  setPostalCode(picked.postalCode);
+                  setCity(picked.city);
+                  setAddressNotes(picked.notes ?? '');
+                  check.reset();
+                }
+              }}
+            >
+              <option value="">{t('account.newAddress')}</option>
+              {savedAddresses.map((a) => (
+                <option key={a.id} value={a.id}>
+                  {a.label ? `${a.label}: ` : ''}{a.street}, {a.city}
+                </option>
+              ))}
+            </SelectField>
+          )}
+          <TextField label={t('shop.street')} autoComplete="street-address" value={street} onChange={(e) => { setStreet(e.target.value); setSavedAddressId(''); }} error={placeErrors.field('deliveryAddress.street') ?? checkErrors.field('street')} />
           <div className="grid grid-cols-[8rem_1fr] gap-3">
-            <TextField label={t('shop.postalCode')} autoComplete="postal-code" inputMode="numeric" value={postalCode} onChange={(e) => setPostalCode(e.target.value)} error={placeErrors.field('deliveryAddress.postalCode') ?? checkErrors.field('postalCode')} />
-            <TextField label={t('shop.city')} autoComplete="address-level2" value={city} onChange={(e) => setCity(e.target.value)} error={placeErrors.field('deliveryAddress.city') ?? checkErrors.field('city')} />
+            <TextField label={t('shop.postalCode')} autoComplete="postal-code" inputMode="numeric" value={postalCode} onChange={(e) => { setPostalCode(e.target.value); setSavedAddressId(''); }} error={placeErrors.field('deliveryAddress.postalCode') ?? checkErrors.field('postalCode')} />
+            <TextField label={t('shop.city')} autoComplete="address-level2" value={city} onChange={(e) => { setCity(e.target.value); setSavedAddressId(''); }} error={placeErrors.field('deliveryAddress.city') ?? checkErrors.field('city')} />
           </div>
           <TextField label={t('shop.addressNotes')} value={addressNotes} onChange={(e) => setAddressNotes(e.target.value)} />
+          {signedIn && savedAddressId === '' && (
+            <Checkbox label={t('account.saveForLater')} checked={saveAddress} onChange={(e) => setSaveAddress(e.target.checked)} />
+          )}
           <Button variant="secondary" className="self-start" disabled={check.isPending} onClick={() => check.mutate({ street, postalCode, city })}>
             {t('shop.checkAddress')}
           </Button>

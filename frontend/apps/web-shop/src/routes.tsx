@@ -1,4 +1,6 @@
 import type { RouteObject } from 'react-router';
+import { AccountLoginPage } from './pages/AccountLoginPage';
+import { AccountPage } from './pages/AccountPage';
 import { CartPage } from './pages/CartPage';
 import { CheckoutPage } from './pages/CheckoutPage';
 import { FakePayPage } from './pages/FakePayPage';
@@ -17,6 +19,8 @@ export const routes: RouteObject[] = [
       { path: 'checkout', element: <CheckoutPage /> },
       { path: 'order/:token', element: <TrackingPage /> },
       { path: 'pay/fake/:providerPaymentId', element: <FakePayPage /> },
+      { path: 'account', element: <AccountPage /> },
+      { path: 'account/login', element: <AccountLoginPage /> },
     ],
   },
 ];

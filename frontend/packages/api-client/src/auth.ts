@@ -76,8 +76,13 @@ export class AuthSession {
     return () => this.#listeners.delete(listener);
   };
 
-  async login(email: string, password: string): Promise<void> {
-    const response = await this.#post('/api/auth/login', { email, password });
+  login(email: string, password: string): Promise<void> {
+    return this.signIn('/api/auth/login', { email, password });
+  }
+
+  /** Calls an endpoint that answers with a token pair (staff login, shop login or registration) and keeps it. */
+  async signIn(path: string, body: unknown): Promise<void> {
+    const response = await this.#post(path, body);
     if (!response.ok) {
       throw await ApiError.fromResponse(response);
     }

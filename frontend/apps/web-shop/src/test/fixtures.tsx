@@ -44,9 +44,24 @@ export const json = (body: unknown, status = 200) => () => Response.json(body, {
 
 type Handler = (request: Request) => Response | Promise<Response>;
 
-export function renderShop({ path = '/', routes: fake = {}, cart = [] }: { path?: string; routes?: Record<string, Handler>; cart?: CartItem[] }) {
+export const tokens = json({ tokenType: 'Bearer', accessToken: 'access', refreshToken: 'refresh', expiresIn: 1800 });
+
+export function renderShop({
+  path = '/',
+  routes: fake = {},
+  cart = [],
+  signedIn = false,
+}: {
+  path?: string;
+  routes?: Record<string, Handler>;
+  cart?: CartItem[];
+  /** A customer signed in earlier (refresh token in storage). */
+  signedIn?: boolean;
+}) {
   const requests: Request[] = [];
-  const handlers: Record<string, Handler> = { 'GET /api/shop': json(shop), ...fake };
+  const handlers: Record<string, Handler> = { 'GET /api/shop': json(shop), 'POST /api/auth/refresh': tokens, ...fake };
+  let refreshToken: string | null = signedIn ? 'refresh' : null;
+  const tokenStore = { load: () => refreshToken, save: (token: string | null) => (refreshToken = token) };
   const fetch = async (request: Request) => {
     requests.push(request.clone());
     const handler = handlers[`${request.method} ${new URL(request.url).pathname}`];
@@ -58,13 +73,15 @@ export function renderShop({ path = '/', routes: fake = {}, cart = [] }: { path?
   const tracking: { push: () => void } = { push: () => undefined };
   const router = createMemoryRouter(routes, { initialEntries: [path] });
   render(
-    <ShopServicesProvider services={createShopServices({ fetch, cartStore, trackingFeed: (_token, onChange) => { tracking.push = onChange; return () => undefined; } })}>
+    <ShopServicesProvider services={createShopServices({ fetch, cartStore, tokenStore, trackingFeed: (_token, onChange) => { tracking.push = onChange; return () => undefined; } })}>
       <RouterProvider router={router} />
     </ShopServicesProvider>,
   );
 
   return {
     router,
+    requests,
+    signedIn: () => refreshToken !== null,
     cart: () => saved,
     /** Simulates a live "order changed" push. */
     pushTracking: () => act(() => tracking.push()),

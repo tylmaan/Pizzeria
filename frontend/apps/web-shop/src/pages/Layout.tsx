@@ -2,6 +2,7 @@ import { errorCodeOf, previewUnitPrice } from '@pizzeria/api-client';
 import { formatMoney, useCodeTranslations, useTranslation } from '@pizzeria/i18n';
 import { Alert } from '@pizzeria/ui';
 import { Link, Outlet, useLocation } from 'react-router';
+import { useSignedIn } from '../app/account';
 import { useShop } from '../app/services';
 import { useCart } from '../cart/cart';
 
@@ -11,6 +12,7 @@ export function Layout() {
   const shop = useShop();
   const cart = useCart();
   const path = useLocation().pathname;
+  const signedIn = useSignedIn();
 
   if (shop.isError) {
     return (
@@ -29,9 +31,12 @@ export function Layout() {
 
   return (
     <div className="flex min-h-screen flex-col">
-      <header className="bg-orange-600 px-4 py-3 text-white">
+      <header className="flex items-center justify-between gap-3 bg-orange-600 px-4 py-3 text-white">
         <Link to="/" className="text-2xl font-bold">
           {shop.data.companyName}
+        </Link>
+        <Link to={signedIn ? '/account' : '/account/login'} className="flex min-h-12 items-center text-lg font-semibold underline">
+          {signedIn ? t('account.title') : t('account.signIn')}
         </Link>
       </header>
       <main className={`mx-auto w-full max-w-xl flex-1 p-4 ${showCartBar ? 'pb-24' : ''}`}>

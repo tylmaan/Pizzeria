@@ -1,4 +1,14 @@
-import { ApiError, createApiClient, unwrap, type ApiClient, type DeliveryCheckRequest, type PlaceOrderRequest } from '@pizzeria/api-client';
+import {
+  ApiError,
+  AuthSession,
+  createApiClient,
+  localStorageTokenStore,
+  unwrap,
+  type ApiClient,
+  type DeliveryCheckRequest,
+  type PlaceOrderRequest,
+  type RefreshTokenStore,
+} from '@pizzeria/api-client';
 import { QueryClient, QueryClientProvider, useMutation, useQuery } from '@tanstack/react-query';
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
 import { CartProvider, localStorageCartStore, type CartStore } from '../cart/cart';
@@ -6,17 +16,29 @@ import { signalRTrackingFeed, type TrackingFeed } from './trackingFeed';
 
 export interface ShopServices {
   api: ApiClient;
+  /** Optional customer account; signed out = guest. */
+  session: AuthSession;
   queryClient: QueryClient;
   cartStore: CartStore;
   trackingFeed: TrackingFeed;
 }
 
 export function createShopServices(
-  options: { fetch?: (request: Request) => Promise<Response>; cartStore?: CartStore; trackingFeed?: TrackingFeed } = {},
+  options: {
+    fetch?: (request: Request) => Promise<Response>;
+    cartStore?: CartStore;
+    trackingFeed?: TrackingFeed;
+    tokenStore?: RefreshTokenStore;
+  } = {},
 ): ShopServices {
+  const session = new AuthSession({
+    store: options.tokenStore ?? localStorageTokenStore('pizzeria.shop.refreshToken'),
+    ...(options.fetch ? { fetch: (input, init) => options.fetch!(new Request(new URL(String(input), globalThis.location.origin), init)) } : {}),
+  });
   return {
-    // Anonymous: the API recognises the shop by the host name.
-    api: createApiClient(options.fetch ? { fetch: options.fetch } : {}),
+    // The API recognises the shop by the host name; a signed-in customer also sends a token.
+    api: createApiClient({ session, ...(options.fetch ? { fetch: options.fetch } : {}) }),
+    session,
     queryClient: new QueryClient({
       defaultOptions: {
         queries: {
@@ -41,7 +63,7 @@ export function ShopServicesProvider({ services, children }: { services: ShopSer
   );
 }
 
-function useServices(): ShopServices {
+export function useServices(): ShopServices {
   const services = useContext(ServicesContext);
   if (services === null) {
     throw new Error('Shop services are missing.');
