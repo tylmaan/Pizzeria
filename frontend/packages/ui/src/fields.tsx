@@ -81,9 +81,16 @@ export function Checkbox({ label, className = '', ...props }: CheckboxProps) {
   );
 }
 
-export function Alert({ children }: { children: ReactNode }) {
+const alertTones = {
+  error: 'border-red-700 bg-red-50 font-semibold text-red-800',
+  success: 'border-green-700 bg-green-50 text-green-900',
+  info: 'border-neutral-400 bg-neutral-50 text-neutral-900',
+} as const;
+
+/** Errors interrupt screen readers (role=alert); success and info messages are announced politely. */
+export function Alert({ children, tone = 'error' }: { children: ReactNode; tone?: keyof typeof alertTones }) {
   return (
-    <div role="alert" className="rounded-lg border-2 border-red-700 bg-red-50 px-4 py-3 text-lg font-semibold text-red-800">
+    <div role={tone === 'error' ? 'alert' : 'status'} className={`rounded-lg border-2 px-4 py-3 text-lg ${alertTones[tone]}`}>
       {children}
     </div>
   );

@@ -101,6 +101,24 @@ describe('order queue', () => {
     await waitFor(async () => expect(await bodiesOf('POST /api/orders/o-1/driver')).toEqual([{ driverId: 'd-1' }]));
   });
 
+  test('an accepted order can print its kitchen ticket again, with the reason when it cannot', async () => {
+    renderQueue([order({ status: 'Accepted', nextStatus: 'InPreparation' })], {
+      'POST /api/orders/o-1/reprint': json({ code: 'printing.no_agent' }, 422),
+    });
+
+    fireEvent.click(await screen.findByRole('button', { name: 'Drukuj bon ponownie' }));
+
+    expect(await screen.findByText('W tym lokalu nie ma podłączonego komputera z drukarką.')).toBeTruthy();
+    expect(screen.queryAllByRole('button', { name: 'Drukuj bon ponownie' })).toHaveLength(1);
+  });
+
+  test('a new order has nothing to reprint yet', async () => {
+    renderQueue([order({})]);
+
+    await screen.findByRole('article', { name: '#12' });
+    expect(screen.queryByRole('button', { name: 'Drukuj bon ponownie' })).toBeNull();
+  });
+
   test('pressing N opens a new phone order', async () => {
     const { router } = renderQueue([]);
     await screen.findAllByText('Brak zamówień.');

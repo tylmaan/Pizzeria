@@ -79,6 +79,22 @@ public sealed class PrintingTests(PizzeriaApiFactory factory)
     }
 
     [Fact]
+    public async Task Reprint_QueuesKitchenTicket_OnlyWhenTheLocationHasAnAgent()
+    {
+        var shop = await TestShop.CreateAsync(factory, _lat);
+        var order = await PlaceAndAcceptAsync(shop);
+        using var noAgent = await shop.Tenant.Admin.PostAsync(new Uri($"/api/orders/{order.Id}/reprint", UriKind.Relative), null);
+        await RegisterAgentAsync(shop.Tenant.Admin, shop.Location.Id);
+
+        using var reprint = await shop.Tenant.Admin.PostAsync(new Uri($"/api/orders/{order.Id}/reprint", UriKind.Relative), null);
+
+        Assert.Equal(HttpStatusCode.UnprocessableEntity, noAgent.StatusCode);
+        Assert.Equal(HttpStatusCode.OK, reprint.StatusCode);
+        var job = Assert.Single(await GetAsync<List<PrintJobDto>>(shop.Tenant.Admin, $"/api/locations/{shop.Location.Id}/print-jobs"));
+        Assert.Equal((order.Id, PrintJobKind.KitchenTicket, PrintJobStatus.Pending), (job.OrderId, job.Kind, job.Status));
+    }
+
+    [Fact]
     public async Task FiscalReceipt_FollowsLocationSetting()
     {
         var shop = await TestShop.CreateAsync(factory, _lat);

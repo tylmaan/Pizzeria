@@ -146,6 +146,10 @@ public sealed class PrintingService(
         var order = await db.Orders.AsNoTracking().FirstOrDefaultAsync(o => o.Id == orderId, ct).ConfigureAwait(false)
             ?? throw new NotFoundException(ErrorCodes.OrderNotFound);
         await RequireStaffOfAsync(order.LocationId, ct).ConfigureAwait(false);
+        if (!await db.PrintAgents.AnyAsync(a => a.LocationId == order.LocationId && !a.IsRevoked, ct).ConfigureAwait(false))
+        {
+            throw new UnprocessableException(ErrorCodes.NoPrintAgent);
+        }
 
         var job = PrintJob.Create(order.CompanyId, order.LocationId, order.Id, PrintJobKind.KitchenTicket,
             PrintPayloads.For(PrintJobKind.KitchenTicket, order), clock.GetUtcNow());

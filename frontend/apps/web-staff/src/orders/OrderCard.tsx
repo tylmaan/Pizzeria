@@ -2,6 +2,7 @@ import { errorCodeOf, type StaffOrderDto } from '@pizzeria/api-client';
 import { formatMoney, useCodeTranslations, useTranslation } from '@pizzeria/i18n';
 import { Alert, Button, SelectField, TextField } from '@pizzeria/ui';
 import { useState } from 'react';
+import { useReprintTicket } from '../printing/queries';
 import { useAdvanceOrder, useAssignDriver, useCancelOrder, useDrivers } from './queries';
 
 export function OrderCard({ order, now, canCancel }: { order: StaffOrderDto; now: number; canCancel: boolean }) {
@@ -100,6 +101,8 @@ export function OrderCard({ order, now, canCancel }: { order: StaffOrderDto; now
         </Button>
       )}
 
+      {order.status !== 'New' && order.status !== 'Cancelled' && <Reprint orderId={order.id} />}
+
       {canCancel &&
         (cancelling ? (
           <div className="flex flex-col gap-2 rounded-lg bg-red-50 p-2">
@@ -119,5 +122,22 @@ export function OrderCard({ order, now, canCancel }: { order: StaffOrderDto; now
           </Button>
         ))}
     </article>
+  );
+}
+
+/** Lost or unreadable kitchen ticket: print it again (needs a connected agent). */
+function Reprint({ orderId }: { orderId: string }) {
+  const { t } = useTranslation();
+  const codes = useCodeTranslations();
+  const reprint = useReprintTicket();
+
+  return (
+    <div className="flex flex-col gap-1">
+      <Button variant="secondary" disabled={reprint.isPending} onClick={() => reprint.mutate(orderId)}>
+        {t('printing.reprint')}
+      </Button>
+      {reprint.isSuccess && <p className="text-base text-green-800" role="status">{t('printing.reprinted')}</p>}
+      {reprint.error && <Alert>{codes.error(errorCodeOf(reprint.error))}</Alert>}
+    </div>
   );
 }

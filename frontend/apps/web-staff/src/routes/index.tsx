@@ -15,6 +15,7 @@ import { EditModifierGroupPage, NewModifierGroupPage } from '../menu/ModifierGro
 import { EditProductPage, NewProductPage } from '../menu/ProductFormPage';
 import { OrdersPage } from '../orders/OrdersPage';
 import { PhoneOrderPage } from '../orders/PhoneOrderPage';
+import { PrintingPage } from '../printing/PrintingPage';
 import { ReportsPage } from '../reports/ReportsPage';
 import { ZoneFormPage } from '../zones/ZoneFormPage';
 import { ZonesPage } from '../zones/ZonesPage';
@@ -63,6 +64,14 @@ export const routes: RouteObject[] = [
         element: (
           <RequireRole roles={rolesFor('/reports')}>
             <ReportsPage />
+          </RequireRole>
+        ),
+      },
+      {
+        path: 'printing',
+        element: (
+          <RequireRole roles={rolesFor('/printing')}>
+            <PrintingPage />
           </RequireRole>
         ),
       },

@@ -6,7 +6,7 @@ namespace Pizzeria.LocalAgent.Printing;
 
 public sealed class SimulatorOptions
 {
-    /// <summary>Where printouts are written (relative to the agent's working directory).</summary>
+    /// <summary>Where printouts are written (relative paths: next to the agent executable).</summary>
     public string OutputDirectory { get; set; } = "print-output";
 }
 
@@ -30,7 +30,8 @@ public sealed partial class SimulatedPrinter(IOptions<SimulatorOptions> options,
 
     private async Task WriteAsync(string name, string text, CancellationToken ct)
     {
-        var directory = Path.GetFullPath(options.Value.OutputDirectory);
+        // Relative to the executable: a Windows service runs with System32 as its working directory.
+        var directory = Path.GetFullPath(options.Value.OutputDirectory, AppContext.BaseDirectory);
         Directory.CreateDirectory(directory);
         var stamp = clock.GetLocalNow().ToString("yyyyMMdd-HHmmss-fff", CultureInfo.InvariantCulture);
         var path = Path.Combine(directory, $"{stamp}-{name}.txt");

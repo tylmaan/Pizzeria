@@ -12,7 +12,8 @@
     "mainMenu": "Menu główne",
     "menu": "Menu",
     "shifts": "Rozliczenia",
-    "reports": "Raporty"
+    "reports": "Raporty",
+    "printing": "Drukowanie"
   },
   "placeholder": {
     "comingSoon": "Ta sekcja jest w budowie.",
@@ -167,6 +168,14 @@
     },
     "report": {
       "invalid_range": "Nieprawidłowy zakres dat (maksymalnie rok)."
+    },
+    "printing": {
+      "agent_not_found": "Nie znaleziono komputera z agentem.",
+      "job_not_found": "Nie znaleziono wydruku.",
+      "no_agent": "W tym lokalu nie ma podłączonego komputera z drukarką.",
+      "agent_revoked": "Ten komputer został odłączony.",
+      "invalid_name": "Podaj nazwę komputera.",
+      "job_not_retryable": "Ponowić można tylko wydruk zakończony błędem."
     }
   },
   "validation": {
@@ -500,5 +509,52 @@
     "deliveries": "Kursy",
     "avgDelivery": "Śr. czas dostawy (min)",
     "noData": "Brak danych w tym okresie."
+  },
+  "printing": {
+    "title": "Drukowanie",
+    "agents": "Komputery z drukarkami",
+    "noAgents": "Brak podłączonych komputerów. Bony i paragony nie będą drukowane, dopóki nie dodasz komputera z agentem.",
+    "online": "online",
+    "offline": "offline",
+    "unknown": "nieznany",
+    "notConfigured": "brak",
+    "receiptPrinter": "Drukarka bonów",
+    "fiscalPrinter": "Drukarka fiskalna",
+    "lastSeen": "ostatni kontakt: {{time}}",
+    "revoke": "Odłącz",
+    "addAgent": "Dodaj komputer",
+    "agentName": "Nazwa komputera",
+    "register": "Dodaj",
+    "tokenOnce": "Komputer „{{name}}” dodany. Token urządzenia (widoczny tylko teraz):",
+    "tokenHowTo": "Wpisz go w konfiguracji agenta (Agent:Token) na komputerze w lokalu. Jeśli go zgubisz, odłącz komputer i dodaj go ponownie.",
+    "settings": "Ustawienia druku",
+    "kitchenTickets": "Drukuj bon kuchenny po przyjęciu zamówienia",
+    "fiscalTrigger": "Paragon fiskalny",
+    "fiscalHint": "Moment wystawiania paragonu ustal z księgową lub serwisem kas — system go nie zgaduje.",
+    "trigger": {
+      "Never": "Nie drukuj automatycznie",
+      "OnAccepted": "Po przyjęciu zamówienia",
+      "OnCompleted": "Po wydaniu lub dostarczeniu"
+    },
+    "save": "Zapisz",
+    "saved": "Zapisano.",
+    "jobs": "Ostatnie wydruki",
+    "noJobs": "Jeszcze nic nie drukowano.",
+    "when": "Kiedy",
+    "kind": "Rodzaj",
+    "status": "Status",
+    "kinds": {
+      "KitchenTicket": "Bon kuchenny",
+      "FiscalReceipt": "Paragon fiskalny"
+    },
+    "statuses": {
+      "Pending": "Czeka na drukarkę",
+      "Sent": "Wysłano",
+      "Printed": "Wydrukowano",
+      "Failed": "Błąd"
+    },
+    "retry": "Ponów",
+    "reprint": "Drukuj bon ponownie",
+    "reprinted": "Bon wysłany do drukarki."
   }
 }

@@ -220,7 +220,8 @@ Zasada: SignalR tylko **powiadamia** o zmianie, źródłem prawdy jest REST API.
 - Wywołania huba nie przechodzą przez middleware HTTP, więc `HubTenantFilter` ustawia `TenantContext` przy połączeniu i przy każdym wywołaniu (`TenantResolver`, wspólny z middleware). Token bearer dla WebSocketów idzie w `access_token` w query (tylko dla ścieżki huba).
 - `SignalROrderNotifier` (`IOrderNotifier`) wysyła powiadomienie po złożeniu zamówienia i po każdej zmianie statusu (`OrderWorkflowService`).
 - **Klienci:** w `web-staff` jest `OrdersFeed` (wstrzykiwany przez `createAppServices`, w testach podmieniany). Panel, kuchnia i kierowca robią invalidację zapytań. Bez połączenia lista odpytuje API co 30 s, a ekran pokazuje „Brak połączenia na żywo”. W `web-shop` jest `TrackingFeed` (anonimowo), z odpytywaniem co 15 s jako zapasem. W dev Vite proxuje `/hubs` z `ws: true`.
-- `DriversHub` (GPS) i `AgentHub` (drukarki) powstaną w etapie 2.
+- Osobnego `DriversHub` nie ma: pozycje kierowców idą REST-em, a powiadomienie `DriverMoved` przez `OrdersHub` (patrz etap 2).
+- `AgentHub` (`/hubs/agent`) jest tylko dla agenta lokalnego: wpuszcza wyłącznie schemat `AgentToken` (polityka `Agent`), grupa `agent:{locationId}`. Serwer wysyła tylko `JobsAvailable`; agent sam woła `FetchJobs`, `Confirm(jobId, printed, error)` i `Heartbeat(receiptOnline, fiscalOnline)`. SignalR (oba huby) serializuje enumy jako nazwy.
 
 ## Konwencje
 
@@ -312,10 +313,18 @@ pnpm typecheck
 pnpm test
 pnpm build
 pnpm generate:api   # typy z OpenAPI → packages/api-client/src/schema.ts (API musi działać na :5080)
+
+# agent lokalny (drukarki; w Development łączy się z http://localhost:5080, wydruki symulatora w print-output/ obok exe)
+cd backend
+# token z panelu: Drukowanie → Dodaj komputer (pokazywany raz)
+dotnet user-secrets --project src/Pizzeria.LocalAgent set "Agent:Token" "<token>"
+dotnet run --project src/Pizzeria.LocalAgent
+# na komputerze w lokalu: dotnet publish, w appsettings.json obok exe Agent:ApiUrl + Agent:Token, potem np.
+# sc.exe create PizzeriaAgent binPath= "C:PizzeriaPizzeria.LocalAgent.exe" start= auto
 ```
 
 Konwencje szkieletu:
-- Wersje pakietów NuGet centralnie w `backend/Directory.Packages.props`, wspólne ustawienia (net10.0, nullable, warnings as errors, analizatory) w `backend/Directory.Build.props`. Pakiety Microsoft/EF/Npgsql trzymamy na linii **10.x** (najnowsze 11.x wymagają net11).
+- Wersje pakietów NuGet centralnie w `backend/Directory.Packages.props`, wspólne ustawienia (net10.0, nullable, warnings as errors, analizatory) w `backend/Directory.Build.props`. Pakiety Microsoft/EF/Npgsql trzymamy na linii **10.x** (najnowsze 11.x wymagają net11). `Microsoft.AspNetCore.SignalR.Client` jest na 10.0.15, bo 10.0.12 ma znaną lukę (NU1903 przerywa build).
 - Migracje w `src/Pizzeria.Infrastructure/Persistence/Migrations` są oznaczone w `.editorconfig` jako kod generowany (bez analizatorów).
 - Endpointy API pod prefiksem `/api/...` (proxy Vite przekazuje `/api` bez przepisywania). `/health` poza prefiksem.
 - Aplikacje frontendu importują i18n wyłącznie z `@pizzeria/i18n` (re-eksport `useTranslation`), klucze tłumaczeń są typowane.
@@ -341,7 +350,16 @@ Cel: jedno zamówienie przechodzi całą drogę od klienta do dostarczenia.
 - ✅ GPS na żywo (lokal + klient), rozliczenie zmiany kierowcy. Pozycja idzie REST-em (`POST /api/driver/position`) tylko przy otwartej zmianie, a powiadomienie `DriverMoved` przez SignalR. Ślad kasuje `DriverPositionRetention` (Api/Background) po `DriverTracking:RetentionDays` (domyślnie 30). Mapa kierowców w panelu jest zwijana i odpytuje API co 15 s.
 - ✅ Płatności online (na razie fake provider). Zamówienie online startuje jako `PendingOnline`, a `Accept` jest zablokowane (`order.awaiting_payment`) do potwierdzenia płatności. `Payment` to jedna próba płatności (klient może ponowić z linku śledzenia). Webhook `POST /api/payments/webhooks/{provider}` sprawdza podpis i szuka płatności poza filtrem tenanta (webhook nie ma tenanta), po czym działa już w firmie tej płatności. Jest idempotentny: zakończona próba się nie zmienia, a opłacone zamówienie zostaje opłacone. Płatności online są wyłączone, dopóki nie ustawi się `Payments:Provider` (w Development i testach `Fake`). Nie ma ich też w zamówieniach telefonicznych. Fake: strona `/pay/fake/{id}` w sklepie wysyła webhook podpisany HMAC (`/api/payments/fake/{id}/complete` istnieje tylko przy providerze Fake). Prawdziwy operator wymaga danych dostępowych per firma (szyfrowanych, np. ASP.NET Data Protection) — do zrobienia razem z wyborem operatora.
 - ✅ Raporty: widok `report_orders` (migracja `AddReportViews`: dzień lokalny = `placed_at AT TIME ZONE` strefy lokalu, momenty etapów z historii statusów) i zapytania SQL w `Infrastructure/Reports/ReportQueries` — **surowe SQL nie ma filtra tenanta, każde zapytanie filtruje `company_id` jawnie**. `GET /api/reports?locationId=&from=&to=` (maks. rok): utarg (tylko `Delivered`/`PickedUp`) per dzień i forma płatności, bestsellery, średnie czasy, kierowcy. Admin firmy: dowolny lokal lub cała firma; kierownik: tylko swój lokal. Ekran „Raporty” w panelu.
-- Następne: konta klientów, agent lokalny + drukarki
+- ✅ Agent lokalny + drukarka bonów (symulator). Szczegóły niżej. Drukarka fiskalna: interfejs i symulator są, prawdziwy model czeka na decyzję (otwarte decyzje).
+- Następne: konta klientów
+
+**Drukowanie — jak to jest zrobione:**
+- `PrintAgent` (lokal, nazwa, hash SHA-256 tokenu urządzenia, ostatni kontakt, status drukarek) i `PrintJob` (rodzaj `KitchenTicket`/`FiscalReceipt`, status `Pending → Sent → Printed/Failed`, payload JSON w `jsonb`, liczba prób). Token pokazuje się raz przy rejestracji w panelu („Drukowanie” → „Dodaj komputer”); zgubiony = odłącz i dodaj ponownie.
+- `PrintJobScheduler` (po każdej zmianie statusu w `OrderWorkflowService`) tworzy zadania wg ustawień lokalu: bon kuchenny przy `Accepted` (`PrintKitchenTickets`, domyślnie tak), paragon wg `FiscalReceiptTrigger` (`Never` domyślnie / `OnAccepted` / `OnCompleted`). Bez aktywnego agenta zadań się nie tworzy (i dodruk zwraca `printing.no_agent`), żeby nie drukować starych bonów po podłączeniu komputera.
+- Uwierzytelnianie agenta: `AgentTokenAuthenticationHandler` (Api/Auth) szuka agenta po hashu **poza filtrem tenanta** (`AgentAuthenticationService`) i wystawia claimy: rola `Agent` (nie jest rolą Identity, nie da się jej nadać), `company_id`, `location_id`. Token działa tylko na `/hubs/agent`, a tokeny pracowników nie otwierają tego huba. Odłączony agent jest odcinany przy następnym wywołaniu (hub zrywa połączenie), a ponowne połączenie dostaje 401.
+- `FetchJobs` oddaje `Pending` oraz `Sent` niepotwierdzone przez 2 min (agent mógł paść), oznacza je `Sent`. Dwa komputery jednego lokalu nie dostaną tego samego zadania: `xmin` jako token współbieżności, przegrany dostaje pustą listę. `Failed` można ponowić z panelu.
+- Agent (`Pizzeria.LocalAgent`, Worker Service + `AddWindowsService`): `AgentWorker` trzyma połączenie (automatyczny reconnect bez limitu, pierwsze połączenie ponawiane z backoffem), pobiera zadania po `JobsAvailable`, po reconnect i co `Agent:PollInterval` (1 min). Heartbeat co 30 s, panel uznaje agenta za online przez 90 s. `PrintJobProcessor` nigdy nie rzuca: błąd drukarki lub złe dane = zadanie `Failed` z komunikatem. Drukarki za `IReceiptPrinter` / `IFiscalPrinter` (`Printers:Receipt` / `Printers:Fiscal` = `Simulator` albo `None`); symulator zapisuje wydruk tekstowy (`TicketFormatter`, 42 znaki) do `print-output/`. Kontrakt payloadów jest skopiowany w agencie (`Pizzeria.LocalAgent/Printing/PrintPayloads.cs`), bo agent nie referencjonuje projektów API — zmieniać obie strony razem. Konfiguracja leży obok exe (content root = katalog aplikacji).
+- Panel: ekran „Drukowanie” (admin, kierownik, obsługa): komputery online/offline ze statusem drukarek, ostatnie 50 wydruków z ponowieniem; admin i kierownik dodają/odłączają komputery i zmieniają ustawienia druku. Na karcie zamówienia (od „przyjęte”) przycisk „Drukuj bon ponownie".
 - Testy frontendu: `pnpm test` uruchamia pakiety po kolei (`--workspace-concurrency=1`), bo równoległe jsdom potrafiło skończyć się brakiem pamięci
 - Płatności online (pierwszy operator), konta klientów
 - Agent lokalny + drukarka bonów, potem drukarka fiskalna (pierwszy model)
@@ -364,7 +382,9 @@ Cel: jedno zamówienie przechodzi całą drogę od klienta do dostarczenia.
 - [ ] Zamówienie telefoniczne z dostawą trafia do lokalu wynikającego ze strefy adresu (może to być inny lokal niż ten, który odebrał telefon). Czy tak ma zostać?
 - [ ] Godziny otwarcia lokali: nie zaimplementowane, zamówienia są przyjmowane zawsze
 - [ ] Kierowca dołącza do grupy SignalR całego lokalu (widzi numery i statusy wszystkich zamówień lokalu, ale szczegóły tylko swoich przez API)
-- [ ] Obsługiwane modele drukarek fiskalnych i zasady wystawiania paragonów
+- [ ] Obsługiwane modele drukarek fiskalnych i zasady wystawiania paragonów (moment wydruku jest ustawieniem lokalu, domyślnie „nie drukuj”; brak NIP-u na paragonie, stawek VAT per produkt i form płatności w formacie drukarki — do ustalenia z serwisem kas)
+- [ ] Kilka komputerów z agentem w jednym lokalu: dowolny agent bierze dowolne zadanie. Jeśli drukarka bonów i fiskalna będą na różnych komputerach, trzeba kierować zadania wg drukarek agenta
+- [ ] Drukarka bonów: na razie tylko symulator; konkretny model/połączenie (USB, sieć, ESC/POS przez port 9100?) do ustalenia
 - [ ] Czy lokal może chwilowo wyłączać dostępność pozycji z menu (założone: tak)
 - [ ] Reguła ceny pół na pół (założone: cena droższej połówki, konfigurowalne — zrobione: droższa / średnia)
 - [ ] Dodatki przy pizzy pół na pół: na razie tylko na całą pizzę i tylko z grup wspólnych dla obu połówek. Czy potrzebne są dodatki „na połówkę” i jak je wyceniać?
