@@ -27,6 +27,9 @@ public static class ErrorCodes
     public const string AddressNotDelivered = "delivery.address_not_delivered";
 
     public const string OrderNotFound = "order.not_found";
+    public const string NoNextStatus = "order.no_next_status";
+    public const string StatusChangeNotAllowed = "order.status_change_not_allowed";
+    public const string DriverNotFound = "order.driver_not_found";
 
     public const string UserEmailTaken = "user.email_taken";
     public const string RoleNotAssignable = "user.role_not_assignable";

@@ -32,4 +32,7 @@ public interface IUserAccountService
     /// <param name="locationIds">When set, only users assigned to at least one of these locations.</param>
     /// <param name="ct">Cancellation token.</param>
     Task<IReadOnlyList<UserDto>> ListAsync(Guid companyId, IReadOnlyCollection<Guid>? locationIds, CancellationToken ct);
+
+    /// <summary>Whether the user is a driver of the current company assigned to the location.</summary>
+    Task<bool> IsDriverAtLocationAsync(Guid userId, Guid locationId, CancellationToken ct);
 }

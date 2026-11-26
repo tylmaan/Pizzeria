@@ -1,13 +1,17 @@
 using System.Globalization;
 using System.Text.Json.Serialization;
 using System.Threading.RateLimiting;
+using Microsoft.AspNetCore.Authentication.BearerToken;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.SignalR;
 using Pizzeria.Api.Auth;
 using Pizzeria.Api.Endpoints;
 using Pizzeria.Api.Errors;
+using Pizzeria.Api.Realtime;
 using Pizzeria.Api.Tenancy;
 using Pizzeria.Application;
+using Pizzeria.Application.Orders;
 using Pizzeria.Infrastructure;
 using Pizzeria.Infrastructure.Persistence;
 using Serilog;
@@ -44,6 +48,11 @@ builder.Services.Configure<ForwardedHeadersOptions>(options =>
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration).AddSignInManager();
 builder.Services.Configure<TenancyOptions>(builder.Configuration.GetSection(TenancyOptions.SectionName));
+builder.Services.AddScoped<TenantResolver>();
+
+builder.Services.AddSignalR(options => options.AddFilter<HubTenantFilter>());
+// Replaces the no-op notifier registered by AddApplication.
+builder.Services.AddSingleton<IOrderNotifier, SignalROrderNotifier>();
 
 builder.Services
     .AddAuthentication(IdentityConstants.BearerScheme)
@@ -51,6 +60,20 @@ builder.Services
     {
         options.BearerTokenExpiration = TimeSpan.FromMinutes(30);
         options.RefreshTokenExpiration = TimeSpan.FromDays(14);
+        // Browsers cannot set headers on WebSocket requests: SignalR sends the token in the query string.
+        options.Events = new BearerTokenEvents
+        {
+            OnMessageReceived = context =>
+            {
+                if (context.Request.Path.StartsWithSegments(OrdersHub.Path)
+                    && context.Request.Query["access_token"] is { Count: > 0 } token)
+                {
+                    context.Token = token;
+                }
+
+                return Task.CompletedTask;
+            },
+        };
     });
 AuthorizationPolicies.Configure(builder.Services.AddAuthorizationBuilder());
 
@@ -101,6 +124,10 @@ api.MapUserEndpoints();
 api.MapMenuEndpoints();
 api.MapDeliveryEndpoints();
 api.MapShopEndpoints();
+api.MapOrderEndpoints();
+
+// Anonymous connections are allowed (customer tracking); hub methods check access themselves.
+app.MapHub<OrdersHub>(OrdersHub.Path).AllowAnonymous();
 
 await DatabaseInitializer.InitializeAsync(app.Services).ConfigureAwait(false);
 

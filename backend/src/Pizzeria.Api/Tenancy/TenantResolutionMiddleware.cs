@@ -16,14 +16,13 @@ public sealed class TenancyOptions
 }
 
 /// <summary>
-/// Populates <see cref="TenantContext"/> for the request: from the access token for signed-in users,
-/// otherwise from the shop host name. Must run after authentication.
+/// Fills <see cref="TenantContext"/>: from the access token for signed-in users, otherwise from the shop host name.
+/// Used per HTTP request (middleware) and per SignalR hub invocation (hub filter).
 /// </summary>
-public sealed class TenantResolutionMiddleware(RequestDelegate next, IOptions<TenancyOptions> options)
+public sealed class TenantResolver(TenantContext tenant, ICompanyResolver companies, IOptions<TenancyOptions> options)
 {
-    public async Task InvokeAsync(HttpContext context, TenantContext tenant, ICompanyResolver companies)
+    public async Task ResolveAsync(ClaimsPrincipal user, string host, CancellationToken ct)
     {
-        var user = context.User;
         if (user.Identity?.IsAuthenticated == true)
         {
             tenant.SetUser(
@@ -32,13 +31,11 @@ public sealed class TenantResolutionMiddleware(RequestDelegate next, IOptions<Te
                 user.FindAll(ClaimTypes.Role).Select(c => c.Value),
                 user.FindAll(TenantClaims.LocationId).Select(c => Guid.Parse(c.Value)));
         }
-        else if (FindShopSlug(context.Request.Host.Host, options.Value.ShopRootDomain) is { } slug
-                 && await companies.FindCompanyIdBySlugAsync(slug, context.RequestAborted).ConfigureAwait(false) is { } companyId)
+        else if (FindShopSlug(host, options.Value.ShopRootDomain) is { } slug
+                 && await companies.FindCompanyIdBySlugAsync(slug, ct).ConfigureAwait(false) is { } companyId)
         {
             tenant.SetAnonymous(companyId);
         }
-
-        await next(context).ConfigureAwait(false);
     }
 
     public static string? FindShopSlug(string host, string rootDomain)
@@ -56,4 +53,14 @@ public sealed class TenantResolutionMiddleware(RequestDelegate next, IOptions<Te
     }
 
     private static Guid? ParseGuid(string? value) => Guid.TryParse(value, out var id) ? id : null;
+}
+
+/// <summary>Resolves the tenant for every HTTP request. Must run after authentication.</summary>
+public sealed class TenantResolutionMiddleware(RequestDelegate next)
+{
+    public async Task InvokeAsync(HttpContext context, TenantResolver resolver)
+    {
+        await resolver.ResolveAsync(context.User, context.Request.Host.Host, context.RequestAborted).ConfigureAwait(false);
+        await next(context).ConfigureAwait(false);
+    }
 }

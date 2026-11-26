@@ -4,12 +4,14 @@ using FluentValidation.Results;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Pizzeria.Application.Errors;
+using Pizzeria.Application.Tenancy;
 using Pizzeria.Application.Users;
+using Pizzeria.Domain.Identity;
 using Pizzeria.Infrastructure.Persistence;
 
 namespace Pizzeria.Infrastructure.Identity;
 
-public sealed class UserAccountService(UserManager<AppUser> userManager, AppDbContext db, TimeProvider clock)
+public sealed class UserAccountService(UserManager<AppUser> userManager, AppDbContext db, TimeProvider clock, ITenantContext tenant)
     : IUserAccountService
 {
     public async Task<Guid> CreateAsync(NewUserAccount account, CancellationToken ct)
@@ -67,6 +69,13 @@ public sealed class UserAccountService(UserManager<AppUser> userManager, AppDbCo
 
         return rows.ConvertAll(r => new UserDto(r.Id, r.Email ?? string.Empty, r.DisplayName, r.Role ?? string.Empty, r.LocationIds));
     }
+
+    public Task<bool> IsDriverAtLocationAsync(Guid userId, Guid locationId, CancellationToken ct) =>
+        // Users have no tenant filter: the company check is explicit (current tenant).
+        db.Users
+            .Where(u => u.Id == userId && u.CompanyId == tenant.CompanyId && u.Locations.Any(l => l.LocationId == locationId))
+            .Where(u => db.UserRoles.Any(ur => ur.UserId == u.Id && db.Roles.Any(r => r.Id == ur.RoleId && r.Name == Roles.Driver)))
+            .AnyAsync(ct);
 
     private static void ThrowIfFailed(IdentityResult result)
     {

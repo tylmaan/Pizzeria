@@ -42,7 +42,7 @@ public sealed class ShopTenantResolutionTests
     [InlineData("evilplatforma.pl", "platforma.pl", null)]
     public void FindShopSlug_ExtractsSingleLabelSubdomain(string host, string root, string? expected)
     {
-        Assert.Equal(expected, TenantResolutionMiddleware.FindShopSlug(host, root));
+        Assert.Equal(expected, TenantResolver.FindShopSlug(host, root));
     }
 
     [Theory]

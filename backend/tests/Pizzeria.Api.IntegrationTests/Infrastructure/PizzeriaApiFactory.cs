@@ -5,7 +5,9 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
+using Pizzeria.Api.Realtime;
 using Pizzeria.Application.Delivery;
+using Pizzeria.Application.Orders;
 using Testcontainers.PostgreSql;
 
 namespace Pizzeria.Api.IntegrationTests.Infrastructure;
@@ -23,6 +25,9 @@ public sealed class PizzeriaApiFactory : WebApplicationFactory<Program>, IAsyncL
 
     /// <summary>Replaces the fake geocoder so tests decide where an address lies.</summary>
     public StubGeocoder Geocoder { get; } = new();
+
+    /// <summary>Order notifications sent by the API (still delivered to SignalR clients).</summary>
+    public RecordingNotifier? Notifications { get; private set; }
 
     public async Task InitializeAsync() => await _database.StartAsync();
 
@@ -54,7 +59,12 @@ public sealed class PizzeriaApiFactory : WebApplicationFactory<Program>, IAsyncL
         builder.UseSetting("RateLimiting:LoginAttemptsPerMinute", "10000");
         builder.UseSetting("RateLimiting:DeliveryChecksPerMinute", "10000");
         builder.UseSetting("RateLimiting:OrdersPerMinute", "10000");
-        builder.ConfigureTestServices(services => services.AddSingleton<IGeocodingService>(Geocoder));
+        builder.ConfigureTestServices(services =>
+        {
+            services.AddSingleton<IGeocodingService>(Geocoder);
+            services.AddSingleton<SignalROrderNotifier>();
+            services.AddSingleton<IOrderNotifier>(sp => Notifications ??= new RecordingNotifier(sp.GetRequiredService<SignalROrderNotifier>()));
+        });
     }
 }
 

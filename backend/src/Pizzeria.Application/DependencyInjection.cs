@@ -30,6 +30,8 @@ public static class DependencyInjection
         services.AddScoped<ShopService>();
         services.AddScoped<PlaceOrderService>();
         services.AddScoped<OrderTrackingService>();
+        services.AddScoped<OrderQueueService>();
+        services.AddScoped<OrderWorkflowService>();
         services.AddSingleton<IOrderNotifier, NullOrderNotifier>();
         services.AddScoped<UserService>();
 
